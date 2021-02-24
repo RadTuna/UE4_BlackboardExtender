@@ -1,0 +1,10 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.BlackboardExtender.cpp.obj": [
+			"BlackboardExtender.cpp.obj",
+			"BlackboardExtenderCommands.cpp.obj",
+			"BlackboardExtenderStyle.cpp.obj"
+		]
+	}
+}

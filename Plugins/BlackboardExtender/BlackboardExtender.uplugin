@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "BlackboardExtender",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "RadTuna",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "BlackboardExtender",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}

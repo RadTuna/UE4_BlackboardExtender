@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-BlackboardExtender-0003.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Programming\UE4_Projects\BlackboardExtension\Intermediate\Build\Win64\BlackboardExtensionEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h.obj"
+"C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\Module.BlackboardExtender.cpp.obj"
+"C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\Default.rc2.res"
+/OUT:"C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\UE4Editor-BlackboardExtender-0003.lib"
+/INCLUDE:IMPLEMENT_MODULE_BlackboardExtender

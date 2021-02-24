@@ -1,0 +1,8 @@
+/Saved
+/Intermediate
+/.vs
+/Build
+*_BuiltData.uasset
+*.sln
+*.pdb
+*.exe
