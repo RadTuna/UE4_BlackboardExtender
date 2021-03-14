@@ -233,11 +233,14 @@
 /I Runtime\AIModule\Classes
 /I ..\Intermediate\Build\Win64\UE4Editor\Inc\ToolMenus
 /I Developer\ToolMenus\Public
-/I C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Source
-/I C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Source\BlackboardExtender\Public
 /I ..\Intermediate\Build\Win64\UE4Editor\Inc\BehaviorTreeEditor
 /I Editor\BehaviorTreeEditor\Classes
 /I Editor\BehaviorTreeEditor\Public
+/I ..\Intermediate\Build\Win64\UE4Editor\Inc\AIGraph
+/I Editor\AIGraph\Classes
+/I Editor\AIGraph\Public
+/I C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Source
+/I C:\Programming\UE4_Projects\BlackboardExtension\Plugins\BlackboardExtender\Source\BlackboardExtender\Public
 /I ThirdParty\PhysX3\PxShared\include
 /I ThirdParty\PhysX3\PxShared\include\cudamanager
 /I ThirdParty\PhysX3\PxShared\include\filebuf

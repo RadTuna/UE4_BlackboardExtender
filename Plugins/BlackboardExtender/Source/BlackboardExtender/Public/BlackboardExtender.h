@@ -11,18 +11,15 @@ class FMenuBuilder;
 class FBlackboardExtenderModule : public IModuleInterface
 {
 public:
-
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
-	/** This function will be bound to Command. */
-	void PluginButtonClicked();
-	
-private:
-	void CreateBlackboardMenu(FMenuBuilder& MenuBuilder);
-	void CreateBehaviorTreeMenu(FMenuBuilder& MenuBuilder);
+
+	TSharedPtr<class FBlackboardExtenderInstance> GetBlackboardExtenderInstance() const { return BlackboardExtenderInstance; }
 
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
+	TSharedPtr<class FBlackboardExtenderInstance> BlackboardExtenderInstance;
+
+	TArray<TSharedPtr<class FAssetTypeActions_Base>> AssetTypeActionsList;
+	
 };

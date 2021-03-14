@@ -3,82 +3,56 @@
 // Primary Include
 #include "BlackboardExtender.h"
 
-// Engine Include
-#include "BehaviorTreeEditor/Public/BehaviorTreeEditorModule.h"
-#include "Misc/MessageDialog.h"
-
 // User Include
+#include "AssetToolsModule.h"
+#include "AssetTypeActions_ExtendBehaviorTree.h"
+#include "AssetTypeActions_ExtendBlackboard.h"
 #include "BlackboardExtenderStyle.h"
 #include "BlackboardExtenderCommands.h"
+#include "BlackboardExtenderInstance.h"
+#include "IAssetTools.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
 
-
-static const FName BlackboardExtenderTabName("BlackboardExtender");
 
 #define LOCTEXT_NAMESPACE "FBlackboardExtenderModule"
 
 void FBlackboardExtenderModule::StartupModule()
 {
+	// Initialize UI style
 	FBlackboardExtenderStyle::Initialize();
 	FBlackboardExtenderStyle::ReloadTextures();
 
+	// Register commands
 	FBlackboardExtenderCommands::Register();
 
-	PluginCommands = MakeShareable(new FUICommandList);
+	// Make extender instance
+	BlackboardExtenderInstance = MakeShared<FBlackboardExtenderInstance>();
 
-	// bind blackboard view command and action(function)
-	PluginCommands->MapAction(
-		FBlackboardExtenderCommands::Get().BlackboardViewAction,
-		FExecuteAction::CreateRaw(this, &FBlackboardExtenderModule::PluginButtonClicked),
-		FCanExecuteAction());
+	// Unregister asset type actions in behavior tree editor
+	IAssetTools& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+	TWeakPtr<IAssetTypeActions> OldBehaviorTreeAssetTypeActions = AssetToolsModule.GetAssetTypeActionsForClass(UBehaviorTree::StaticClass());
+	AssetToolsModule.UnregisterAssetTypeActions(OldBehaviorTreeAssetTypeActions.Pin().ToSharedRef());
 
-	// bind blackboard detail command and action(function)
-	PluginCommands->MapAction(
-	    FBlackboardExtenderCommands::Get().BlackboardDetailAction,
-		FExecuteAction::CreateRaw(this, &FBlackboardExtenderModule::PluginButtonClicked),
-		FCanExecuteAction());
+	TWeakPtr<IAssetTypeActions> OldBlackboardAssetTypeActions = AssetToolsModule.GetAssetTypeActionsForClass(UBlackboardData::StaticClass());
+	AssetToolsModule.UnregisterAssetTypeActions(OldBlackboardAssetTypeActions.Pin().ToSharedRef());
+	
+	// Register asset type actions
+	TSharedPtr<FAssetTypeActions_ExtendBehaviorTree> BehaviorTreeAssetTypeActions = MakeShared<FAssetTypeActions_ExtendBehaviorTree>();
+	AssetTypeActionsList.Add(BehaviorTreeAssetTypeActions);
+	AssetToolsModule.RegisterAssetTypeActions(BehaviorTreeAssetTypeActions.ToSharedRef());
 
-	FBehaviorTreeEditorModule& BehaviorTreeEditorModule = FModuleManager::LoadModuleChecked<FBehaviorTreeEditorModule>("BehaviorTreeEditor");
-
-	TSharedRef<FExtender> BlackboardExtender = MakeShared<FExtender>();
-	BlackboardExtender->AddMenuExtension(
-		"BlackboardEditor",
-		EExtensionHook::After,
-		PluginCommands,
-		FMenuExtensionDelegate::CreateRaw(this, &FBlackboardExtenderModule::CreateBlackboardMenu));
-
-	BlackboardExtender->AddMenuExtension(
-		"BehaviorTreeEditor",
-		EExtensionHook::After,
-		PluginCommands,
-		FMenuExtensionDelegate::CreateRaw(this, &FBlackboardExtenderModule::CreateBehaviorTreeMenu));
-
-	BehaviorTreeEditorModule.GetMenuExtensibilityManager()->AddExtender(BlackboardExtender);
-
+	TSharedPtr<FAssetTypeActions_ExtendBlackboard> BlackboardAssetTypeActions = MakeShared<FAssetTypeActions_ExtendBlackboard>();
+	AssetTypeActionsList.Add(BlackboardAssetTypeActions);
+	AssetToolsModule.RegisterAssetTypeActions(BlackboardAssetTypeActions.ToSharedRef());
 }
 
 void FBlackboardExtenderModule::ShutdownModule()
 {
 	FBlackboardExtenderStyle::Shutdown();
+
 	FBlackboardExtenderCommands::Unregister();
 }
-
-void FBlackboardExtenderModule::PluginButtonClicked()
-{
-	FText DialogText = FText::FromString(TEXT("Test Out"));
-	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
-}
-
-void FBlackboardExtenderModule::CreateBlackboardMenu(FMenuBuilder& MenuBuilder)
-{
-	MenuBuilder.AddMenuEntry(FBlackboardExtenderCommands::Get().BlackboardViewAction);
-	MenuBuilder.AddMenuEntry(FBlackboardExtenderCommands::Get().BlackboardDetailAction);
-}
-
-void FBlackboardExtenderModule::CreateBehaviorTreeMenu(FMenuBuilder& MenuBuilder)
-{
-	MenuBuilder.AddMenuEntry(FBlackboardExtenderCommands::Get().BlackboardViewAction);
-}
-
 
 #undef LOCTEXT_NAMESPACE
 	

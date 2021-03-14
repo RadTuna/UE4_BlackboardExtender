@@ -1,8 +1,10 @@
 /Saved
 /Intermediate
 /.vs
+/.idea
 /Build
 *_BuiltData.uasset
 *.sln
 *.pdb
 *.exe
+*.lnk
