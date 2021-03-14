@@ -10,6 +10,8 @@
 #include "BlackboardExtenderInstance.h"
 #include "BehaviorTree/BehaviorTree.h"
 
+#include "BehaviorTreeEditor/Private/DetailCustomizations/BlackboardDataDetails.h"
+
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
 

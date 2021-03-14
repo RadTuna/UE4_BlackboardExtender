@@ -6,7 +6,7 @@
 #include "Framework/Commands/Commands.h"
 #include "BlackboardExtenderStyle.h"
 
-class FBlackboardExtenderCommands : public TCommands<FBlackboardExtenderCommands>
+class FBlackboardExtenderCommands final : public TCommands<FBlackboardExtenderCommands>
 {
 public:
 
@@ -22,4 +22,19 @@ public:
 	TSharedPtr<FUICommandInfo> BlackboardViewAction;
 	TSharedPtr<FUICommandInfo> BlackboardDetailAction;
 
+};
+
+class FExtenderDebuggerCommands final : public TCommands<FExtenderDebuggerCommands>
+{
+public:
+	FExtenderDebuggerCommands()
+		: TCommands<FExtenderDebuggerCommands>(TEXT("BlackboardExtender.Debugger"), NSLOCTEXT("Contexts", "Debugger", "Debugger"), NAME_None, FBlackboardExtenderStyle::GetStyleSetName())
+	{
+	}
+
+	TSharedPtr<FUICommandInfo> CurrentValues;
+	TSharedPtr<FUICommandInfo> SavedValues;
+
+	/** Initialize commands */
+	virtual void RegisterCommands() override;
 };

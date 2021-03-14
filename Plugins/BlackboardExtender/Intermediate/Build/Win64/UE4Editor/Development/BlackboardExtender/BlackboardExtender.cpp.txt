@@ -55,3 +55,4 @@ D:\UnrealEngine4\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/Bla
 D:\UnrealEngine4\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/Blackboard/BlackboardKeyType.h
 D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BlackboardKeyType.generated.h
 D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BlackboardData.generated.h
+D:\UnrealEngine4\UE_4.25\Engine\Source\Editor\BehaviorTreeEditor/Private/SBehaviorTreeBlackboardView.h

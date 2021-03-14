@@ -84,14 +84,27 @@ void FBlackboardExtenderInstance::CreateBlackboardMenu(FMenuBuilder& MenuBuilder
 	MenuBuilder.AddMenuEntry(FBlackboardExtenderCommands::Get().BlackboardDetailAction);
 }
 
+void FBlackboardExtenderInstance::SpawnBlackboardView()
+{
+	SNew()
+}
+
+void FBlackboardExtenderInstance::SpawnBlackboardDetails()
+{
+}
+
 void FBlackboardExtenderInstance::OnOpenBlackboardView()
 {
 	FText DialogText = FText::FromString(TEXT("Open Blackboard View!"));
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
+
+	SpawnBlackboardView();
 }
 
 void FBlackboardExtenderInstance::OnOpenBlackboardDetailView()
 {
 	FText DialogText = FText::FromString(TEXT("Open Blackboard Detail View!"));
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
+
+	SpawnBlackboardDetails();
 }

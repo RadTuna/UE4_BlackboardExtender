@@ -16,6 +16,9 @@ public:
 private:
 	void CreateBehaviorTreeMenu(FMenuBuilder& MenuBuilder);
 	void CreateBlackboardMenu(FMenuBuilder& MenuBuilder);
+
+	void SpawnBlackboardView();
+	void SpawnBlackboardDetails();
 	
 	void OnOpenBlackboardView();
 	void OnOpenBlackboardDetailView();

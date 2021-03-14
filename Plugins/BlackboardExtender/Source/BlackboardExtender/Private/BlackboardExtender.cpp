@@ -14,17 +14,21 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 
+#include "BehaviorTreeEditor/Private/SBehaviorTreeBlackboardView.h"
+
 
 #define LOCTEXT_NAMESPACE "FBlackboardExtenderModule"
 
 void FBlackboardExtenderModule::StartupModule()
 {
+	FTab
 	// Initialize UI style
 	FBlackboardExtenderStyle::Initialize();
 	FBlackboardExtenderStyle::ReloadTextures();
 
 	// Register commands
 	FBlackboardExtenderCommands::Register();
+	FExtenderDebuggerCommands::Register();
 
 	// Make extender instance
 	BlackboardExtenderInstance = MakeShared<FBlackboardExtenderInstance>();
@@ -51,7 +55,9 @@ void FBlackboardExtenderModule::ShutdownModule()
 {
 	FBlackboardExtenderStyle::Shutdown();
 
+	// Unregister commands
 	FBlackboardExtenderCommands::Unregister();
+	FExtenderDebuggerCommands::Unregister();
 }
 
 #undef LOCTEXT_NAMESPACE

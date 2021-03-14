@@ -49,3 +49,5 @@ D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\
 D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BTNode.generated.h
 D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BTCompositeNode.generated.h
 D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BehaviorTree.generated.h
+D:\UnrealEngine4\UE_4.25\Engine\Source\Editor\BehaviorTreeEditor/Private/DetailCustomizations/BlackboardDataDetails.h
+D:\UnrealEngine4\UE_4.25\Engine\Source\Editor\PropertyEditor\Public\IDetailCustomization.h

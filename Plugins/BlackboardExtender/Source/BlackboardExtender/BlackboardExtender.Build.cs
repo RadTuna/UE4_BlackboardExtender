@@ -44,7 +44,9 @@ public class BlackboardExtender : ModuleRules
 				"SlateCore",
                 "BehaviorTreeEditor",
 				"AIGraph",
-				"AIModule"
+				"AIModule",
+				"GraphEditor",
+				"EditorStyle",
                 // ... add private dependencies that you statically link with here ...	
 			}
 			);
