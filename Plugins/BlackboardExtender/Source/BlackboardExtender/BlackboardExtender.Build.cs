@@ -36,17 +36,9 @@ public class BlackboardExtender : ModuleRules
 			{
 				"Projects",
 				"InputCore",
-				"UnrealEd",
-				"ToolMenus",
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore",
-                "BehaviorTreeEditor",
-				"AIGraph",
 				"AIModule",
-				"GraphEditor",
-				"EditorStyle",
                 // ... add private dependencies that you statically link with here ...	
 			}
 			);

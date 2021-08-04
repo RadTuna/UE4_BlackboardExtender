@@ -2,13 +2,12 @@
 	"RemapUnityFiles": 
 	{
 		"Module.BlackboardExtender.cpp.obj": [
-			"AssetTypeActions_ExtendBlackboard.cpp.obj",
-			"BlackboardExtenderStyle.cpp.obj",
-			"AssetTypeActions_ExtendBehaviorTree.cpp.obj",
-			"BlackboardExtender.cpp.obj",
-			"BlackboardExtenderCommands.cpp.obj",
-			"BlackboardExtenderInstance.cpp.obj",
-			"SExtendBlackboardView.cpp.obj"
+			"BlackboardDataV2.cpp.obj",
+			"BlackboardExtender.cpp.obj"
+		],
+		"Module.BlackboardExtender.gen.cpp.obj": [
+			"BlackboardDataV2.gen.cpp.obj",
+			"BlackboardExtender.init.gen.cpp.obj"
 		]
 	}
 }

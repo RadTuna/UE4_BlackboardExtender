@@ -7,7 +7,7 @@
 #include "AssetTypeActions_Base.h"
 
 
-class BLACKBOARDEXTENDER_API FAssetTypeActions_ExtendBehaviorTree : public FAssetTypeActions_Base
+class BLACKBOARDEXTENDEREDITOR_API FAssetTypeActions_ExtendBehaviorTree : public FAssetTypeActions_Base
 {
 public:
 	FAssetTypeActions_ExtendBehaviorTree();
@@ -19,5 +19,8 @@ public:
 	virtual UClass* GetSupportedClass() const override;
 	virtual void OpenAssetEditor( const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor = TSharedPtr<IToolkitHost>() ) override;
 	virtual uint32 GetCategories() override;
+
+private:
+	void CreateBehaviorTreeEditor();
 
 };

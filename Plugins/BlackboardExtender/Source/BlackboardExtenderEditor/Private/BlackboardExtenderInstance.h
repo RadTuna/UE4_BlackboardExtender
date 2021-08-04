@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 
-class BLACKBOARDEXTENDER_API FBlackboardExtenderInstance final
+class BLACKBOARDEXTENDEREDITOR_API FBlackboardExtenderInstance final
 {
 public:
 	FBlackboardExtenderInstance();
@@ -24,11 +24,8 @@ private:
 	void OnOpenBlackboardDetailView();
 	
 private:
-	// Current edited behavior tree
-	class UBehaviorTree* BehaviorTree;
-	
 	// Current edited blackboard
-	class UBlackboardData* BlackboardData;
+	class UBlackboardDataV2* BlackboardData;
 
 	// Binded behavior tree editor
 	TWeakPtr<class IBehaviorTreeEditor> BehaviorTreeEditor;

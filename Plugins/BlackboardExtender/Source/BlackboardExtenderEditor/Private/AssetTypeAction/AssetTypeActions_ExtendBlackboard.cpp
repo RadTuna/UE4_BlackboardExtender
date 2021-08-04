@@ -1,15 +1,17 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 // Primary Include
-#include "BlackboardExtender/Public/AssetTypeActions_ExtendBlackboard.h"
+#include "AssetTypeActions_ExtendBlackboard.h"
 
 // Engine Include
 #include "AIModule.h"
-#include "BlackboardExtender.h"
+#include "BlackboardExtenderEditor.h"
 #include "BlackboardExtenderInstance.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTreeEditor/Public/BehaviorTreeEditorModule.h"
 
+// User Include
+#include "BlackboardDataV2.h"
 
 
 FAssetTypeActions_ExtendBlackboard::FAssetTypeActions_ExtendBlackboard()
@@ -22,7 +24,7 @@ FAssetTypeActions_ExtendBlackboard::~FAssetTypeActions_ExtendBlackboard()
 
 UClass* FAssetTypeActions_ExtendBlackboard::GetSupportedClass() const
 {
-	return UBlackboardData::StaticClass();
+	return UBlackboardDataV2::StaticClass();
 }
 
 void FAssetTypeActions_ExtendBlackboard::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
@@ -37,7 +39,7 @@ void FAssetTypeActions_ExtendBlackboard::OpenAssetEditor(const TArray<UObject*>&
 			FBehaviorTreeEditorModule& BehaviorTreeEditorModule = FModuleManager::LoadModuleChecked<FBehaviorTreeEditorModule>("BehaviorTreeEditor");
 			TSharedRef<IBehaviorTreeEditor> NewEditor = BehaviorTreeEditorModule.CreateBehaviorTreeEditor(EToolkitMode::Standalone, EditWithinLevelEditor, BlackboardData);
 
-			FBlackboardExtenderModule& BlackboardExtenderModule = FModuleManager::GetModuleChecked<FBlackboardExtenderModule>("BlackboardExtender");
+			FBlackboardExtenderEditorModule& BlackboardExtenderModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>("BlackboardExtenderEditor");
 			TSharedPtr<FBlackboardExtenderInstance> BlackboardExtenderInstance = BlackboardExtenderModule.GetBlackboardExtenderInstance();
 
 			BlackboardExtenderInstance->InitializeExtenderInstance(Object, NewEditor);

@@ -17,6 +17,11 @@
 	"Modules": [
 		{
 			"Name": "BlackboardExtender",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "BlackboardExtenderEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}

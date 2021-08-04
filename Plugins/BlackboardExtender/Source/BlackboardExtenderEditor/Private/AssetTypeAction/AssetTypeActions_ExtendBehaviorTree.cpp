@@ -1,16 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 // Primary Include
-#include "BlackboardExtender/Public/AssetTypeActions_ExtendBehaviorTree.h"
+#include "AssetTypeActions_ExtendBehaviorTree.h"
 
 // Engine Include
 #include "AIModule.h"
 #include "BehaviorTreeEditorModule.h"
-#include "BlackboardExtender.h"
+#include "BlackboardDataV2.h"
+#include "BlackboardExtenderEditor.h"
 #include "BlackboardExtenderInstance.h"
 #include "BehaviorTree/BehaviorTree.h"
-
-#include "BehaviorTreeEditor/Private/DetailCustomizations/BlackboardDataDetails.h"
+#include "BehaviorTree/BlackboardData.h"
 
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
@@ -38,23 +38,29 @@ void FAssetTypeActions_ExtendBehaviorTree::OpenAssetEditor(const TArray<UObject*
 	{
 		auto* BehaviorTree = Cast<UBehaviorTree>(Object);
 		if (BehaviorTree != nullptr)
-		{			
+		{
 			FBehaviorTreeEditorModule& BehaviorTreeEditorModule = FModuleManager::GetModuleChecked<FBehaviorTreeEditorModule>("BehaviorTreeEditor");
 			TSharedRef<IBehaviorTreeEditor> NewEditor = BehaviorTreeEditorModule.CreateBehaviorTreeEditor(Mode, EditWithinLevelEditor, BehaviorTree);
 			
-			FBlackboardExtenderModule& BlackboardExtenderModule = FModuleManager::GetModuleChecked<FBlackboardExtenderModule>("BlackboardExtender");
+			FBlackboardExtenderEditorModule& BlackboardExtenderModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>("BlackboardExtenderEditor");
 			TSharedPtr<FBlackboardExtenderInstance> BlackboardExtenderInstance = BlackboardExtenderModule.GetBlackboardExtenderInstance();
 
 			BlackboardExtenderInstance->InitializeExtenderInstance(Object, NewEditor);
-		}
-        
-		TArray<TWeakPtr<IAssetTypeActions>> AssetTypeActionsList = AssetToolsModule.Get().GetAssetTypeActionsListForClass(Object->GetClass());
-		for (TWeakPtr<IAssetTypeActions> AssetTypeActions : AssetTypeActionsList)
-		{
-			if (AssetTypeActions.Pin().Get() != this)
+
+			TArray<TWeakPtr<IAssetTypeActions>> AssetTypeActionsList = AssetToolsModule.Get().GetAssetTypeActionsListForClass(Object->GetClass());
+			for (TWeakPtr<IAssetTypeActions> AssetTypeActionsRef : AssetTypeActionsList)
 			{
-				AssetTypeActions.Pin()->OpenAssetEditor(InObjects, EditWithinLevelEditor);
-				break;
+				IAssetTypeActions* AssetTypeActions = AssetTypeActionsRef.Pin().Get();
+				if (AssetTypeActions == nullptr)
+				{
+					continue;
+				}
+				if (AssetTypeActions == this)
+				{
+					continue;
+				}
+
+				AssetTypeActions->OpenAssetEditor(InObjects, EditWithinLevelEditor);
 			}
 		}
 	}	

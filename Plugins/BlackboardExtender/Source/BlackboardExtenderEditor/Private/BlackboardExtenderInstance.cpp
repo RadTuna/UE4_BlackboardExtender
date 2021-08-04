@@ -1,13 +1,15 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 // Primary Include
-#include "BlackboardExtender/Public/BlackboardExtenderInstance.h"
+#include "BlackboardExtenderInstance.h"
 
 // Engine Include
 #include "BlackboardExtenderCommands.h"
-#include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTreeEditor/Public/IBehaviorTreeEditor.h"
+
+// User Include
+#include "BlackboardDataV2.h"
 
 
 FBlackboardExtenderInstance::FBlackboardExtenderInstance()
@@ -21,28 +23,13 @@ FBlackboardExtenderInstance::~FBlackboardExtenderInstance()
 
 void FBlackboardExtenderInstance::InitializeExtenderInstance(UObject* AssetData, TSharedRef<class IBehaviorTreeEditor> InBehaviorTreeEditor)
 {
-	UBehaviorTree* BehaviorTreeToEdit = Cast<UBehaviorTree>(AssetData);
-	UBlackboardData* BlackboardDataToEdit = Cast<UBlackboardData>(AssetData);
-
-	// Assignment behavior tree and blackboard
-	if (BehaviorTreeToEdit != nullptr)
+	UBlackboardDataV2* BlackboardDataToEdit = Cast<UBlackboardDataV2>(AssetData);
+	if (BlackboardDataToEdit == nullptr)
 	{
-		BehaviorTree = BehaviorTreeToEdit;
-		if (BehaviorTreeToEdit->BlackboardAsset != nullptr)
-		{
-			BlackboardData = BehaviorTreeToEdit->BlackboardAsset;
-		}
-	}
-	else if (BlackboardDataToEdit != nullptr)
-	{
-		BlackboardData = BlackboardDataToEdit;
-	}
-	else
-	{
-		checkNoEntry();
+		return;
 	}
 
-	// Assignment behavior tree editor
+	BlackboardData = BlackboardDataToEdit;
 	BehaviorTreeEditor = InBehaviorTreeEditor;
 
 	// Bind tab commands
@@ -86,7 +73,6 @@ void FBlackboardExtenderInstance::CreateBlackboardMenu(FMenuBuilder& MenuBuilder
 
 void FBlackboardExtenderInstance::SpawnBlackboardView()
 {
-	SNew()
 }
 
 void FBlackboardExtenderInstance::SpawnBlackboardDetails()

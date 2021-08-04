@@ -63,7 +63,7 @@ public:
 	bool bIsNew;
 };
 
-class BLACKBOARDEXTENDER_API SExtendBlackboardView : public SCompoundWidget, public FGCObject
+class BLACKBOARDEXTENDEREDITOR_API SExtendBlackboardView : public SCompoundWidget, public FGCObject
 {
 public:
 	SLATE_BEGIN_ARGS( SExtendBlackboardView ) 
