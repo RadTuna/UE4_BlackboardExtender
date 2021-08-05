@@ -35,6 +35,7 @@
 /FUNCTIONPADMIN
 "D:\UE4_Projects\BlackboardExtender\Intermediate\Build\Win64\BlackboardExtensionEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h.obj"
 "D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtenderEditor\Module.BlackboardExtenderEditor.cpp.obj"
+"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtenderEditor\Module.BlackboardExtenderEditor.gen.cpp.obj"
 "D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtenderEditor\Default.rc2.res"
 "delayimp.lib"
 "wininet.lib"
@@ -74,6 +75,7 @@
 "D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\GraphEditor\UE4Editor-GraphEditor.lib"
 "D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\EditorStyle\UE4Editor-EditorStyle.lib"
 "D:\UnrealEngine4\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\Core\UE4Editor-Core.lib"
+"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\UE4Editor-BlackboardExtender.lib"
 /OUT:"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Binaries\Win64\UE4Editor-BlackboardExtenderEditor.dll"
 /IMPLIB:"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtenderEditor\UE4Editor-BlackboardExtenderEditor.suppressed.lib"
 /PDB:"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Binaries\Win64\UE4Editor-BlackboardExtenderEditor.pdb"

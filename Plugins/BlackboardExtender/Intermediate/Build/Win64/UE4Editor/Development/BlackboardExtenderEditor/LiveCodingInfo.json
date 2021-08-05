@@ -9,7 +9,8 @@
 			"BlackboardExtenderEditor.cpp.obj",
 			"BlackboardExtenderInstance.cpp.obj",
 			"BlackboardExtenderStyle.cpp.obj",
-			"SExtendBlackboardView.cpp.obj"
+			"SExtendBlackboardView.cpp.obj",
+			"SBlackboardV2View.cpp.obj"
 		],
 		"Module.BlackboardExtenderEditor.gen.cpp.obj": [
 			"BlackboardDataV2Factory.gen.cpp.obj",
