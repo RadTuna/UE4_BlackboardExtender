@@ -9,9 +9,9 @@ Blueprint Editor에서sms 변수나 함수를 Drag&Drop으로 정렬이 가능�
 복잡한 AI를 개발함에 있어서 Blackboard를 적극 사용할 수 있도록 보조하는 역할을 수행합니다.
 
 ## Milestone
-- BehaviorEditor Hooking (Complete!)
-- Add New Blackboard Asset (Complete!)
-- Expand Blackboard DetailCustomization (Progress...)
-- Add New Blackboard Entry View SWidget (Wait)
-- Bind BehaviorTree Debugger (Wait)
+- 비헤이비어 트리 후킹 (완료! / 레거시)
+- 새로운 Blackboard Data Asset 추가 (완료!)
+- BehaviorTree Editor 코드 포팅 (완료!)
+- 블랙보드 DetailCustomization 확장 (Progress...)
+- 블랙보드 GraphActionMenu Widget 기능 확장 (Wait)
 - Finish! (Wait)

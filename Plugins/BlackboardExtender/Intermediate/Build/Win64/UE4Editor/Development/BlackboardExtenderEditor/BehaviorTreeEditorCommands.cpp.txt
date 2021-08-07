@@ -1,0 +1,2 @@
+D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtenderEditor\Definitions.BlackboardExtenderEditor.h
+D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Source\BlackboardExtenderEditor\Private\BehaviorTreeEditorCommands.h

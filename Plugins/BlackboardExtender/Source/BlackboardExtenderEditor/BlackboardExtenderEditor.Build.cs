@@ -8,56 +8,60 @@ public class BlackboardExtenderEditor : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				// ... add public include paths required here ...
-			}
-			);
-				
-		
 		PrivateIncludePaths.AddRange(
-			new string[] {
-				// ... add other private include paths required here ...
+            new string[] {
+				"Editor/GraphEditor/Private",
+				"Editor/AIGraph/Private",
+				"Editor/BehaviorTreeEditor/Private",
 			}
-			);
-			
-		
-		PublicDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Core",
-				"BlackboardExtender"
-                // ... add other public dependencies that you statically link with here ...
+		);
+
+        PrivateIncludePathModuleNames.AddRange(
+            new string[] {
+				"AssetRegistry",
+				"AssetTools",
+                "PropertyEditor",
+				"ContentBrowser"
 			}
-			);
-			
-		
+		);
+
 		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Projects",
-				"InputCore",
-				"UnrealEd",
-				"ToolMenus",
-				"CoreUObject",
-				"Engine",
+			new string[] {
+				"Core", 
+				"CoreUObject", 
+				"ApplicationCore",
+				"Engine", 
+                "RenderCore",
+                "InputCore",
 				"Slate",
 				"SlateCore",
-                "BehaviorTreeEditor",
-				"AIGraph",
-				"AIModule",
+                "EditorStyle",
+				"UnrealEd", 
+                "AudioEditor",
+				"MessageLog", 
 				"GraphEditor",
-				"EditorStyle",
-                // ... add private dependencies that you statically link with here ...	
+                "Kismet",
+				"KismetWidgets",
+                "PropertyEditor",
+				"AnimGraph",
+				"BlueprintGraph",
+                "AIGraph",
+                "AIModule",
+				"ClassViewer",
+				"ToolMenus",
+				"BlackboardExtender"
 			}
-			);
-		
-		
+		);
+
+		PublicIncludePathModuleNames.Add("LevelEditor");
+
 		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-				// ... add any modules that your module loads dynamically here ...
-			}
-			);
+            new string[] { 
+                "WorkspaceMenuStructure",
+				"AssetTools",
+				"AssetRegistry",
+				"ContentBrowser"
+            }
+		);
 	}
 }

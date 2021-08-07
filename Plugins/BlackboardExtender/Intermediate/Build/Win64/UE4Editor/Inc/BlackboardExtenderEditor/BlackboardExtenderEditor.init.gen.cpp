@@ -21,8 +21,8 @@ void EmptyLinkFunctionForGeneratedCodeBlackboardExtenderEditor_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000040,
-				0x2D9E8906,
-				0xE0906704,
+				0x10AD9876,
+				0x2024EC3E,
 				METADATA_PARAMS(nullptr, 0)
 			};
 			UE4CodeGen_Private::ConstructUPackage(ReturnPackage, PackageParams);

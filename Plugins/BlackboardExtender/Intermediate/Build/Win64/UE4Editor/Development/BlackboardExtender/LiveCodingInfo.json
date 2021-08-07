@@ -2,11 +2,11 @@
 	"RemapUnityFiles": 
 	{
 		"Module.BlackboardExtender.cpp.obj": [
-			"BlackboardDataV2.cpp.obj",
-			"BlackboardExtender.cpp.obj"
+			"BlackboardExtender.cpp.obj",
+			"BEBlackboardData.cpp.obj"
 		],
 		"Module.BlackboardExtender.gen.cpp.obj": [
-			"BlackboardDataV2.gen.cpp.obj",
+			"BEBlackboardData.gen.cpp.obj",
 			"BlackboardExtender.init.gen.cpp.obj"
 		]
 	}

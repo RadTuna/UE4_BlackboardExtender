@@ -3,6 +3,9 @@
 /.vs
 /.idea
 /Build
+
+/Plugin/BlackboardExtender/Intermediate
+
 *_BuiltData.uasset
 *.sln
 *.pdb

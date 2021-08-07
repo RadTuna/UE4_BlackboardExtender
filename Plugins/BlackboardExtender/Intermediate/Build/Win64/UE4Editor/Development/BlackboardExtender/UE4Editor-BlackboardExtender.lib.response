@@ -7,6 +7,7 @@
 /IGNORE:4221
 /NODEFAULTLIB
 "D:\UE4_Projects\BlackboardExtender\Intermediate\Build\Win64\BlackboardExtensionEditor\Development\Engine\SharedPCH.Engine.ShadowErrors.h.obj"
+"D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\BEBlackboardData.cpp.obj"
 "D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\Module.BlackboardExtender.cpp.obj"
 "D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\Module.BlackboardExtender.gen.cpp.obj"
 "D:\UE4_Projects\BlackboardExtender\Plugins\BlackboardExtender\Intermediate\Build\Win64\UE4Editor\Development\BlackboardExtender\Default.rc2.res"

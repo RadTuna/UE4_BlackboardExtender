@@ -3,33 +3,62 @@
 // Primary Include
 #include "BlackboardExtenderEditor.h"
 
-// User Include
+// Engine Include
 #include "AssetToolsModule.h"
-#include "AssetTypeAction/AssetTypeActions_ExtendBehaviorTree.h"
-#include "AssetTypeAction/AssetTypeActions_ExtendBlackboard.h"
-#include "BlackboardExtenderStyle.h"
-#include "BlackboardExtenderCommands.h"
-#include "BlackboardExtenderInstance.h"
-#include "IAssetTools.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
+#include "BEBehaviorTreeDecoratorGraphNode_Decorator.h"
+#include "BEBehaviorTreeGraphNode.h"
+#include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
+#include "BehaviorTree/Decorators/BTDecorator_BlueprintBase.h"
+#include "BehaviorTree/Services/BTService_BlueprintBase.h"
+#include "EdGraphUtilities.h"
+#include "IAssetTools.h"
+
+
+// User Include
+#include "AssetTypeActions/AssetTypeActions_ExtendBehaviorTree.h"
+#include "AssetTypeActions/AssetTypeActions_ExtendBlackboard.h"
+#include "BehaviorTreeEditor.h"
+#include "DetailCustomizations/BehaviorDecoratorDetails.h"
+#include "DetailCustomizations/BlackboardDecoratorDetails.h"
+#include "DetailCustomizations/BlackboardSelectorDetails.h"
+#include "SGraphNode_BehaviorTree.h"
+#include "SGraphNode_Decorator.h"
 
 
 #define LOCTEXT_NAMESPACE "FBlackboardExtenderEditorModule"
 
+const FName FBlackboardExtenderEditorModule::BlackboardExtenderEditorAppIdentifier(TEXT("BlackboardExtenderEditorApp"));
+
+class FBEGraphPanelNodeFactory_BehaviorTree : public FGraphPanelNodeFactory
+{
+	virtual TSharedPtr<class SGraphNode> CreateNode(UEdGraphNode* Node) const override
+	{
+		if (UBEBehaviorTreeGraphNode* BTNode = Cast<UBEBehaviorTreeGraphNode>(Node))
+		{
+			return SNew(SGraphNode_BehaviorTree, BTNode);
+		}
+
+		if (UBEBehaviorTreeDecoratorGraphNode_Decorator* InnerNode = Cast<UBEBehaviorTreeDecoratorGraphNode_Decorator>(Node))
+		{
+			return SNew(SGraphNode_Decorator, InnerNode);
+		}
+
+		return NULL;
+	}
+};
+
+TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_BehaviorTree;
+
 void FBlackboardExtenderEditorModule::StartupModule()
 {
-	// Initialize UI style
-	FBlackboardExtenderStyle::Initialize();
-	FBlackboardExtenderStyle::ReloadTextures();
-
-	// Register commands
-	FBlackboardExtenderCommands::Register();
-	FExtenderDebuggerCommands::Register();
-
-	// Make extender instance
-	BlackboardExtenderInstance = MakeShared<FBlackboardExtenderInstance>();
-
+	MenuExtensibilityManager = MakeShareable(new FExtensibilityManager);
+	ToolBarExtensibilityManager = MakeShareable(new FExtensibilityManager);
+	
+	GraphPanelNodeFactory_BehaviorTree = MakeShareable(new FBEGraphPanelNodeFactory_BehaviorTree());
+	FEdGraphUtilities::RegisterVisualNodeFactory(GraphPanelNodeFactory_BehaviorTree);
+	
 	// Unregister asset type actions in behavior tree editor
 	IAssetTools& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	TWeakPtr<IAssetTypeActions> OldBehaviorTreeAssetTypeActions = AssetToolsModule.GetAssetTypeActionsForClass(UBehaviorTree::StaticClass());
@@ -46,17 +75,80 @@ void FBlackboardExtenderEditorModule::StartupModule()
 	TSharedPtr<FAssetTypeActions_ExtendBlackboard> BlackboardAssetTypeActions = MakeShared<FAssetTypeActions_ExtendBlackboard>();
 	AssetTypeActionsList.Add(BlackboardAssetTypeActions);
 	AssetToolsModule.RegisterAssetTypeActions(BlackboardAssetTypeActions.ToSharedRef());
+
+	// Unregister the details customizer
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	PropertyModule.UnregisterCustomPropertyTypeLayout("BlackboardKeySelector");
+	PropertyModule.UnregisterCustomClassLayout("BTDecorator_Blackboard");
+	PropertyModule.UnregisterCustomClassLayout("BTDecorator");
+	PropertyModule.NotifyCustomizationModuleChanged();
+	
+	// Register the details customizer
+	PropertyModule.RegisterCustomPropertyTypeLayout("BlackboardKeySelector",FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FBlackboardSelectorDetails::MakeInstance));
+	PropertyModule.RegisterCustomClassLayout("BTDecorator_Blackboard", FOnGetDetailCustomizationInstance::CreateStatic(&FBlackboardDecoratorDetails::MakeInstance));
+	PropertyModule.RegisterCustomClassLayout("BTDecorator", FOnGetDetailCustomizationInstance::CreateStatic( &FBehaviorDecoratorDetails::MakeInstance));
+	PropertyModule.NotifyCustomizationModuleChanged();
 }
 
 void FBlackboardExtenderEditorModule::ShutdownModule()
 {
-	FBlackboardExtenderStyle::Shutdown();
+	if (!UObjectInitialized())
+	{
+		return;
+	}
 
-	// Unregister commands
-	FBlackboardExtenderCommands::Unregister();
-	FExtenderDebuggerCommands::Unregister();
+	MenuExtensibilityManager.Reset();
+	ToolBarExtensibilityManager.Reset();
+	ClassCache.Reset();
+	
+	if ( GraphPanelNodeFactory_BehaviorTree.IsValid() )
+	{
+		FEdGraphUtilities::UnregisterVisualNodeFactory(GraphPanelNodeFactory_BehaviorTree);
+		GraphPanelNodeFactory_BehaviorTree.Reset();
+	}
+	
+	// Unregister the BehaviorTree item data asset type actions
+	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
+	{
+		IAssetTools& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
+		for(auto& AssetTypeAction : AssetTypeActionsList)
+		{
+			if (AssetTypeAction.IsValid())
+			{
+				AssetToolsModule.UnregisterAssetTypeActions(AssetTypeAction.ToSharedRef());
+			}	
+		}			
+	}
+	AssetTypeActionsList.Empty();
+	
+	// Unregister the details customization
+	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+	{
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		PropertyModule.UnregisterCustomPropertyTypeLayout( "BlackboardKeySelector" );
+		PropertyModule.UnregisterCustomClassLayout( "BTDecorator_Blackboard" );
+		PropertyModule.UnregisterCustomClassLayout( "BTDecorator" );
+		PropertyModule.NotifyCustomizationModuleChanged();
+	}
+}
+
+TSharedRef<IBEBehaviorTreeEditor> FBlackboardExtenderEditorModule::CreateBehaviorTreeEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UObject* Object)
+{
+	if (!ClassCache.IsValid())
+	{
+		ClassCache = MakeShareable(new FGraphNodeClassHelper(UBTNode::StaticClass()));
+		FGraphNodeClassHelper::AddObservedBlueprintClasses(UBTTask_BlueprintBase::StaticClass());
+		FGraphNodeClassHelper::AddObservedBlueprintClasses(UBTDecorator_BlueprintBase::StaticClass());
+		FGraphNodeClassHelper::AddObservedBlueprintClasses(UBTService_BlueprintBase::StaticClass());
+		ClassCache->UpdateAvailableBlueprintClasses();
+	}
+
+	TSharedRef<FBehaviorTreeEditor> NewBehaviorTreeEditor(new FBehaviorTreeEditor());
+	NewBehaviorTreeEditor->InitBehaviorTreeEditor(Mode, InitToolkitHost, Object);
+	return NewBehaviorTreeEditor;
 }
 
 #undef LOCTEXT_NAMESPACE
 	
 IMPLEMENT_MODULE(FBlackboardExtenderEditorModule, BlackboardExtenderEditor)
+DEFINE_LOG_CATEGORY(LogBlackboardExtenderEditor);

@@ -4,20 +4,20 @@
 #include "BlackboardDataV2Factory.h"
 
 // User Include
-#include "BlackboardDataV2.h"
+#include "BEBlackboardData.h"
 
 UBlackboardDataV2Factory::UBlackboardDataV2Factory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	SupportedClass = UBlackboardDataV2::StaticClass();
+	SupportedClass = UBEBlackboardData::StaticClass();
 	bCreateNew = true;
 	bEditAfterNew = true;
 }
 
 UObject* UBlackboardDataV2Factory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	check(InClass->IsChildOf(UBlackboardDataV2::StaticClass()));
-	return NewObject<UBlackboardDataV2>(InParent, InClass, InName, Flags);
+	check(InClass->IsChildOf(UBEBlackboardData::StaticClass()));
+	return NewObject<UBEBlackboardData>(InParent, InClass, InName, Flags);
 }
 
 bool UBlackboardDataV2Factory::CanCreateNew() const
