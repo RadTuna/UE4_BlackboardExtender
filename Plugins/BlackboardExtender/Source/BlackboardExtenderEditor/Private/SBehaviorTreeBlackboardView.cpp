@@ -32,6 +32,7 @@
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "ARFilter.h"
 #include "AssetRegistryModule.h"
+#include "BEBlackboardData.h"
 
 #define LOCTEXT_NAMESPACE "SBehaviorTreeBlackboardView"
 
@@ -217,7 +218,21 @@ private:
 			const FScopedTransaction Transaction(LOCTEXT("BlackboardEntryRenameTransaction", "Rename Blackboard Entry"));
 			BlackboardEntryAction->BlackboardData->SetFlags(RF_Transactional);
 			BlackboardEntryAction->BlackboardData->Modify();
+
+			const FBlackboardEntryIdentifier OldIdentifier(BlackboardEntryAction->Key);
 			BlackboardEntryAction->Key.EntryName = NewName;
+			const FBlackboardEntryIdentifier NewIdentifier(BlackboardEntryAction->Key);
+
+			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardEntryAction->BlackboardData);
+			if (BEBlackboardData != nullptr)
+			{
+				if (BEBlackboardData->Categories.Contains(OldIdentifier))
+				{
+					const FText OldCategory = *BEBlackboardData->Categories.Find(OldIdentifier);
+					BEBlackboardData->Categories.Remove(OldIdentifier);
+					BEBlackboardData->Categories.Add(NewIdentifier, OldCategory);
+				}
+			}
 
 			FProperty* KeysArrayProperty = FindFProperty<FProperty>(UBlackboardData::StaticClass(), GET_MEMBER_NAME_CHECKED(UBlackboardData, Keys));
 			FProperty* NameProperty = FindFProperty<FProperty>(FBlackboardEntry::StaticStruct(), GET_MEMBER_NAME_CHECKED(FBlackboardEntry, EntryName));

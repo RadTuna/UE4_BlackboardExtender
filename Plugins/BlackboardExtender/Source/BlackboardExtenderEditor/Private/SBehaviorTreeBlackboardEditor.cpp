@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "SBehaviorTreeBlackboardEditor.h"
+
+#include "BEBlackboardData.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "Modules/ModuleManager.h"
@@ -122,6 +124,12 @@ void SBehaviorTreeBlackboardEditor::HandleDeleteEntry()
 			{
 				if(BlackboardEntry == &BlackboardData->Keys[ItemIndex])
 				{
+					UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+					if (BEBlackboardData != nullptr)
+					{
+						const FBlackboardEntryIdentifier Identifier(*BlackboardEntry);
+						BEBlackboardData->Categories.Remove(Identifier);
+					}
 					BlackboardData->Keys.RemoveAt(ItemIndex);
 					break;
 				}
@@ -284,6 +292,12 @@ void SBehaviorTreeBlackboardEditor::HandleKeyClassPicked(UClass* InClass)
 	Entry.EntryName = FName(*NewKeyName);
 	Entry.KeyType = NewObject<UBlackboardKeyType>(BlackboardData, InClass);
 
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+	if (BEBlackboardData != nullptr)
+	{
+		const FBlackboardEntryIdentifier Identifier(Entry);
+		BEBlackboardData->Categories.Add(Identifier, LOCTEXT("BlackboardCategory", ""));
+	}
 	BlackboardData->Keys.Add(Entry);
 
 	GraphActionMenu->RefreshAllActions(true);

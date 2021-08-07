@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
+#include "BehaviorTree/BlackboardData.h"
 
 class IDetailLayoutBuilder;
 
@@ -26,4 +27,6 @@ public:
 private:
 	/** Delegate used to retrieve current blackboard selection */
 	FOnGetSelectedBlackboardItemIndex OnGetSelectedBlackboardItemIndex;
+
+	TWeakObjectPtr<UBlackboardData> BlackboardDataCached;
 };

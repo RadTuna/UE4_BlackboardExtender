@@ -1,0 +1,8 @@
+{
+	"BuildId": "13144385",
+	"Modules": 
+	{
+		"BlackboardExtender": "UE4Editor-BlackboardExtender-Win64-DebugGame.dll",
+		"BlackboardExtenderEditor": "UE4Editor-BlackboardExtenderEditor-Win64-DebugGame.dll"
+	}
+}
