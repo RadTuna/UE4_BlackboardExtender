@@ -1,10 +1,10 @@
-/Saved/
-/Intermediate/
+/Saved
+/Intermediate
 /.vs
 /.idea
 /Build/
 
-/Plugins/Intermediate/
+Plugins/BlackboardExtender/Intermediate/
 
 *_BuiltData.uasset
 *.sln
