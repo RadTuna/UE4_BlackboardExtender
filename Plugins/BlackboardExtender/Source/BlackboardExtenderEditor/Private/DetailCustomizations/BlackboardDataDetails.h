@@ -16,6 +16,8 @@ class FBlackboardDataDetails : public IDetailCustomization
 public:
 	FBlackboardDataDetails(FOnGetSelectedBlackboardItemIndex InOnGetSelectedBlackboardItemIndex)
 		: OnGetSelectedBlackboardItemIndex(InOnGetSelectedBlackboardItemIndex)
+		, BlackboardDataCached(nullptr)
+		, CurrentCategorySelection(-1)
 	{}
 
 	/** Makes a new instance of this detail layout class for a specific detail view requesting it */
@@ -25,8 +27,14 @@ public:
 	virtual void CustomizeDetails( IDetailLayoutBuilder& DetailLayout ) override;
 
 private:
+	void HandleOnChangeCategory(const FText& InCategory);
+	void HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType);
+
+private:
 	/** Delegate used to retrieve current blackboard selection */
 	FOnGetSelectedBlackboardItemIndex OnGetSelectedBlackboardItemIndex;
 
 	TWeakObjectPtr<UBlackboardData> BlackboardDataCached;
+	int32 CurrentCategorySelection;
+	bool bIsInheritedSelection;
 };

@@ -20,10 +20,10 @@ TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(FOnGetSele
 void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayout )
 {
 	// First hide all keys
-	//DetailLayout.HideCategory(TEXT("Blackboard"));
+	DetailLayout.HideCategory(TEXT("Blackboard"));
 	DetailLayout.HideProperty(TEXT("Keys"));
 	DetailLayout.HideProperty(TEXT("ParentKeys"));
-	//DetailLayout.HideProperty(TEXT("Categories"));
+	DetailLayout.HideProperty(TEXT("Categories"));
 
 	TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailLayout.GetSelectedObjects();
 	if (SelectedObjects.Num() > 0)
@@ -111,7 +111,8 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 							.Font(FontStyle)
 							.SelectAllTextWhenFocused(true)
 							.ClearKeyboardFocusOnCommit(false)
-							//.OnTextCommitted( this, &SPropertyEditorText::OnTextCommitted )
+							.OnTextChanged(this, &FBlackboardDataDetails::HandleOnChangeCategory)
+							.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedCategory)
 							.SelectAllTextOnCommit(true)
 							.IsReadOnly(false)
 						]
@@ -126,6 +127,42 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 			TSharedPtr<IPropertyHandle> bInstanceSyncedProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, bInstanceSynced));
 			DetailCategoryBuilder.AddProperty(bInstanceSyncedProperty);
 		}	
+	}
+}
+
+void FBlackboardDataDetails::HandleOnChangeCategory(const FText& InCategory)
+{
+	if(OnGetSelectedBlackboardItemIndex.IsBound())
+	{
+		CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
+	}
+}
+
+void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType)
+{
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
+	check(BEBlackboardData != nullptr);
+
+	if (CommitType == ETextCommit::OnEnter)
+	{
+		if(OnGetSelectedBlackboardItemIndex.IsBound())
+		{
+			CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
+		}
+	}
+
+	if (CurrentCategorySelection < 0)
+	{
+		return;
+	}
+
+	const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BEBlackboardData->ParentKeys : BEBlackboardData->Keys;
+	const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
+
+	if (BEBlackboardData->Categories.Contains(Identifier))
+	{
+		BEBlackboardData->Categories.Add(Identifier, InCategory);
 	}
 }
 
