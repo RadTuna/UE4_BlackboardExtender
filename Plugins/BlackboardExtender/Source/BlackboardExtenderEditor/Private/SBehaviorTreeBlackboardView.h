@@ -46,7 +46,7 @@ public:
 	static FName StaticGetTypeId();
 	virtual FName GetTypeId() const;
 
-	FEdGraphSchemaAction_BlackboardEntry( UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, bool bInIsInherited );
+	FEdGraphSchemaAction_BlackboardEntry(UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited);
 
 	void Update();
 
@@ -61,6 +61,8 @@ public:
 
 	/** Temp flag for new items */
 	bool bIsNew;
+
+	FText Category;
 };
 
 /** Displays blackboard entries */
@@ -104,6 +106,8 @@ public:
 
 	/** Set the object we are looking at */
 	void SetObject(UBlackboardData* InBlackboardData);
+
+	void RefreshGraphActionMenuItems();
 
 protected:
 	/** Delegate handler used to generate a widget for an 'action' (key) in the list */

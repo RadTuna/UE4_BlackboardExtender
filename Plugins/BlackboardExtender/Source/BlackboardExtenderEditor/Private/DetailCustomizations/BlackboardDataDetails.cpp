@@ -8,13 +8,15 @@
 #include "DetailCategoryBuilder.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BEBlackboardData.h"
+#include "SBehaviorTreeBlackboardView.h"
+#include "CollisionAnalyzer/Public/ICollisionAnalyzer.h"
 
 
 #define LOCTEXT_NAMESPACE "BlackboardDataDetails"
 
-TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(FOnGetSelectedBlackboardItemIndex InOnGetSelectedBlackboardItemIndex)
+TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(TWeakPtr<SBehaviorTreeBlackboardView> InBlackboardView, FOnGetSelectedBlackboardItemIndex InOnGetSelectedBlackboardItemIndex)
 {
-	return MakeShareable( new FBlackboardDataDetails(InOnGetSelectedBlackboardItemIndex) );
+	return MakeShareable( new FBlackboardDataDetails(InBlackboardView, InOnGetSelectedBlackboardItemIndex) );
 }
 
 void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayout )
@@ -43,6 +45,9 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 		CurrentSelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInherited);
 	}
 
+	CurrentCategorySelection = CurrentSelection;
+	bIsInheritedSelection = bIsInherited;
+
 	if(CurrentSelection >= 0)
 	{
 		TSharedPtr<IPropertyHandle> KeysHandle = bIsInherited ? DetailLayout.GetProperty(TEXT("ParentKeys")) : DetailLayout.GetProperty(TEXT("Keys"));
@@ -55,6 +60,11 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 
 			IDetailCategoryBuilder& DetailCategoryBuilder = DetailLayout.EditCategory("Key");
 			TSharedPtr<IPropertyHandle> EntryNameProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, EntryName));
+
+			FSlateFontInfo FontStyle = FEditorStyle::GetFontStyle(TEXT("PropertyWindow.NormalFont"));
+			const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInherited ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
+			const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentSelection];
+			
 			DetailCategoryBuilder.AddCustomRow(LOCTEXT("EntryNameLabel", "Entry Name"))
 			.NameContent()
 			[
@@ -66,7 +76,15 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 				.IsEnabled(true)
 				+SHorizontalBox::Slot()
 				[
-					EntryNameProperty->CreatePropertyValueWidget()
+					//EntryNameProperty->CreatePropertyValueWidget()
+					SNew(SEditableTextBox)
+					.Text(FText::FromName(CurrentEntry.EntryName))
+					.Font(FontStyle)
+					.SelectAllTextWhenFocused(true)
+					.ClearKeyboardFocusOnCommit(false)
+					.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedEntryName)
+					.SelectAllTextOnCommit(true)
+					.IsReadOnly(false)
 				]
 			];
 
@@ -79,8 +97,6 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
 			if (BEBlackboardData != nullptr)
 			{
-				const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInherited ? BEBlackboardData->ParentKeys : BEBlackboardData->Keys;
-				const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentSelection];
 				const FBlackboardEntryIdentifier Identifier(CurrentEntry);
 				const FText* CurrentCategory = nullptr;
 				if (BEBlackboardData->Categories.Contains(Identifier))
@@ -90,7 +106,6 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 
 				if (CurrentCategory != nullptr)
 				{
-					FSlateFontInfo FontStyle = FEditorStyle::GetFontStyle(TEXT("PropertyWindow.NormalFont"));
 					const FText CategoryRowName = LOCTEXT("EntryCategory", "Category");
 					DetailCategoryBuilder.AddCustomRow(CategoryRowName)
 					.NameContent()
@@ -111,7 +126,6 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 							.Font(FontStyle)
 							.SelectAllTextWhenFocused(true)
 							.ClearKeyboardFocusOnCommit(false)
-							.OnTextChanged(this, &FBlackboardDataDetails::HandleOnChangeCategory)
 							.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedCategory)
 							.SelectAllTextOnCommit(true)
 							.IsReadOnly(false)
@@ -130,11 +144,46 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 	}
 }
 
-void FBlackboardDataDetails::HandleOnChangeCategory(const FText& InCategory)
+void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETextCommit::Type CommitType)
 {
-	if(OnGetSelectedBlackboardItemIndex.IsBound())
+	check(BlackboardDataCached != nullptr);
+	
+	if (CommitType == ETextCommit::OnEnter)
 	{
-		CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
+		if(OnGetSelectedBlackboardItemIndex.IsBound())
+		{
+			CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
+		}
+	}
+
+	if (CurrentCategorySelection < 0)
+	{
+		return;
+	}
+
+	TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
+	FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+	const FBlackboardEntryIdentifier OldIdentifier(CurrentEntry);
+
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
+	if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(OldIdentifier))
+	{
+		const FText Category = *BEBlackboardData->Categories.Find(OldIdentifier);
+		BEBlackboardData->Categories.Remove(OldIdentifier);
+		CurrentEntry.EntryName = FName(*InName.ToString());
+		
+		const FBlackboardEntryIdentifier NewIdentifier(CurrentEntry);
+		BEBlackboardData->Categories.Add(NewIdentifier, Category);
+	}
+	else
+	{
+		CurrentEntry.EntryName = FName(*InName.ToString());
+	}
+
+	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
+	if (BlackboardView.IsValid())
+	{
+		BlackboardView->RefreshGraphActionMenuItems();
 	}
 }
 
@@ -159,10 +208,16 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 	const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BEBlackboardData->ParentKeys : BEBlackboardData->Keys;
 	const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
-
+	
 	if (BEBlackboardData->Categories.Contains(Identifier))
 	{
 		BEBlackboardData->Categories.Add(Identifier, InCategory);
+	}
+
+	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
+	if (BlackboardView.IsValid())
+	{
+		BlackboardView->RefreshGraphActionMenuItems();
 	}
 }
 

@@ -55,20 +55,29 @@ FName FEdGraphSchemaAction_BlackboardEntry::GetTypeId() const
 	return StaticGetTypeId(); 
 }
 
-FEdGraphSchemaAction_BlackboardEntry::FEdGraphSchemaAction_BlackboardEntry( UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, bool bInIsInherited )
+FEdGraphSchemaAction_BlackboardEntry::FEdGraphSchemaAction_BlackboardEntry(UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited)
 	: FEdGraphSchemaAction_Dummy()
 	, BlackboardData(InBlackboardData)
 	, Key(InKey)
 	, bIsInherited(bInIsInherited)
 	, bIsNew(false)
+	, Category(InCategory)
 {
 	check(BlackboardData);
 	Update();
 }
 
+void SBehaviorTreeBlackboardView::RefreshGraphActionMenuItems()
+{
+	if (GraphActionMenu.IsValid())
+	{
+		GraphActionMenu->RefreshAllActions(false);
+	}
+}
+
 void FEdGraphSchemaAction_BlackboardEntry::Update()
 {
-	UpdateSearchData(FText::FromName(Key.EntryName), FText::Format(LOCTEXT("BlackboardEntryFormat", "{0} '{1}'"), Key.KeyType ? Key.KeyType->GetClass()->GetDisplayNameText() : LOCTEXT("NullKeyDesc", "None"), FText::FromName(Key.EntryName)), FText(), FText());
+	UpdateSearchData(FText::FromName(Key.EntryName), FText::Format(LOCTEXT("BlackboardEntryFormat", "{0} '{1}'"), Key.KeyType ? Key.KeyType->GetClass()->GetDisplayNameText() : LOCTEXT("NullKeyDesc", "None"), FText::FromName(Key.EntryName)), Category, FText());
 	SectionID = bIsInherited ? EBlackboardSectionTitles::InheritedKeys : EBlackboardSectionTitles::Keys;
 }
 
@@ -543,12 +552,28 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 	{
 		for(auto& ParentKey : BlackboardData->ParentKeys)
 		{
-			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, ParentKey, true)) );
+			FText Category = FText::GetEmpty();
+			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+			const FBlackboardEntryIdentifier Identifier(ParentKey);
+			if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(Identifier))
+			{
+				Category = *BEBlackboardData->Categories.Find(Identifier);
+			}
+			
+			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, ParentKey, Category, true)) );
 		}
 
 		for(auto& Key : BlackboardData->Keys)
 		{
-			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, Key, false)) );
+			FText Category = FText::GetEmpty();
+			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+			const FBlackboardEntryIdentifier Identifier(Key);
+			if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(Identifier))
+			{
+				Category = *BEBlackboardData->Categories.Find(Identifier);
+			}
+			
+			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, Key, Category, false)) );
 		}
 	}
 }
