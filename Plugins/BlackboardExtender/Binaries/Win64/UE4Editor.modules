@@ -1,8 +1,0 @@
-{
-	"BuildId": "13144385",
-	"Modules": 
-	{
-		"BlackboardExtender": "UE4Editor-BlackboardExtender.dll",
-		"BlackboardExtenderEditor": "UE4Editor-BlackboardExtenderEditor.dll"
-	}
-}

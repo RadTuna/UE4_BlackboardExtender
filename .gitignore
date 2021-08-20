@@ -1,10 +1,15 @@
+
+/Binaries
 /Saved
 /Intermediate
 /.vs
 /.idea
+/DerivedDataCache
 /Build/
 
+
 Plugins/BlackboardExtender/Intermediate/
+Plugins/BlackboardExtender/Binaries
 
 *_BuiltData.uasset
 *.sln
