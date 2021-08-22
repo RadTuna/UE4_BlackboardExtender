@@ -10,9 +10,7 @@ public class BlackboardExtenderEditor : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
             new string[] {
-				"Editor/GraphEditor/Private",
-				"Editor/AIGraph/Private",
-				"Editor/BehaviorTreeEditor/Private",
+				// ...
 			}
 		);
 
