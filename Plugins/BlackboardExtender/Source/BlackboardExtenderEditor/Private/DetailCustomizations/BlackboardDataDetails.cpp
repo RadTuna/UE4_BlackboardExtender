@@ -225,6 +225,16 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 
 	if (BEBlackboardData->Categories.Contains(Identifier))
 	{
+		FText NewCategory = InCategory;
+		if (BEBlackboardData->CategoryMap.Contains(NewCategory.ToString()))
+		{
+			NewCategory = *BEBlackboardData->CategoryMap.Find(NewCategory.ToString());
+		}
+		else
+		{
+			BEBlackboardData->CategoryMap.Add(NewCategory.ToString(), NewCategory);
+		}
+		
 		BEBlackboardData->Categories.Add(Identifier, InCategory);
 	}
 

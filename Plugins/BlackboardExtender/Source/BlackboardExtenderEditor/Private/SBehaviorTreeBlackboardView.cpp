@@ -33,6 +33,7 @@
 #include "ARFilter.h"
 #include "AssetRegistryModule.h"
 #include "BEBlackboardData.h"
+#include "BlackboardEntryDragDropAction.h"
 
 #define LOCTEXT_NAMESPACE "SBehaviorTreeBlackboardView"
 
@@ -73,6 +74,26 @@ void SBehaviorTreeBlackboardView::RefreshGraphActionMenuItems()
 	{
 		GraphActionMenu->RefreshAllActions(false);
 	}
+}
+
+FReply SBehaviorTreeBlackboardView::HandleOnDraggedAction(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions, const FPointerEvent& MouseEvent)
+{
+	TSharedPtr<FEdGraphSchemaAction> InAction(InActions.Num() > 0 ? InActions[0] : nullptr);
+	if (InAction.IsValid())
+	{
+		if (InAction->GetTypeId() == FEdGraphSchemaAction_BlackboardEntry::StaticGetTypeId())
+		{
+			FEdGraphSchemaAction_BlackboardEntry* Action = reinterpret_cast<FEdGraphSchemaAction_BlackboardEntry*>(InAction.Get());
+			UClass* EntryClass = Action->GetEntryUClass();
+			if (EntryClass != nullptr)
+			{
+				TSharedRef<FBlackboardEntryDragDropAction> DragOperation = FBlackboardEntryDragDropAction::New(InAction, Action->GetEntryName(), EntryClass);
+				return FReply::Handled().BeginDragDrop(DragOperation);
+			}
+		}
+	}
+
+	return FReply::Unhandled();
 }
 
 void FEdGraphSchemaAction_BlackboardEntry::Update()
@@ -528,6 +549,7 @@ void SBehaviorTreeBlackboardView::Construct(const FArguments& InArgs, TSharedRef
 				.OnCollectAllActions(this, &SBehaviorTreeBlackboardView::HandleCollectAllActions)
 				.OnGetSectionTitle(this, &SBehaviorTreeBlackboardView::HandleGetSectionTitle)
 				.OnActionSelected(this, &SBehaviorTreeBlackboardView::HandleActionSelected)
+				.OnActionDragged(this, &SBehaviorTreeBlackboardView::HandleOnDraggedAction)
 				.OnContextMenuOpening(this, &SBehaviorTreeBlackboardView::HandleContextMenuOpening, InCommandList)
 				.OnActionMatchesName(this, &SBehaviorTreeBlackboardView::HandleActionMatchesName)
 				.AlphaSortItems(GetDefault<UEditorPerProjectUserSettings>()->bDisplayBlackboardKeysInAlphabeticalOrder)

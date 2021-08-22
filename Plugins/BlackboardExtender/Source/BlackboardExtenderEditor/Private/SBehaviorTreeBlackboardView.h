@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BehaviorTree/BlackboardData.h"
 #include "UObject/GCObject.h"
 #include "Layout/Visibility.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
@@ -63,6 +64,18 @@ public:
 	bool bIsNew;
 
 	FText Category;
+
+public:
+	FName GetEntryName() const
+	{
+		return Key.EntryName;
+	}
+
+	UClass* GetEntryUClass() const
+	{
+		return BlackboardData->GetClass();
+	}
+	
 };
 
 /** Displays blackboard entries */
@@ -163,6 +176,8 @@ protected:
 
 	/** Delegate handler used to match an FName to an action in the list, used for renaming keys */
 	bool HandleActionMatchesName(FEdGraphSchemaAction* InAction, const FName& InName) const;
+
+	FReply HandleOnDraggedAction(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions, const FPointerEvent& MouseEvent);
 
 protected:
 	/** The blackboard we are editing/viewing */

@@ -57,5 +57,7 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category=Blackboard)
 	TMap<FBlackboardEntryIdentifier, FText> Categories;
+
+	TMap<FString, FText> CategoryMap;
 #endif
 };
