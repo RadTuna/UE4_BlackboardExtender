@@ -52,6 +52,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 	{
 		TSharedPtr<IPropertyHandle> KeysHandle = bIsInherited ? DetailLayout.GetProperty(TEXT("ParentKeys")) : DetailLayout.GetProperty(TEXT("Keys"));
 		check(KeysHandle.IsValid());
+		KeysPropertyHandleCached = KeysHandle;
 		uint32 NumChildKeys = 0;
 		KeysHandle->GetNumChildren(NumChildKeys);
 		if((uint32)CurrentSelection < NumChildKeys)
@@ -91,7 +92,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 #if WITH_EDITORONLY_DATA
 // 			TSharedPtr<IPropertyHandle> EntryDescriptionHandle = ElementProperty->GetChildHandle("EntryDescription");
 			TSharedPtr<IPropertyHandle> EntryDescriptionHandle = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, EntryDescription));
-
+			
 			DetailCategoryBuilder.AddProperty(EntryDescriptionHandle);
 
 			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
@@ -146,8 +147,12 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 
 void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETextCommit::Type CommitType)
 {
+	if (!KeysPropertyHandleCached.IsValid())
+	{
+		return;
+	}
+
 	check(BlackboardDataCached != nullptr);
-	
 	if (CommitType == ETextCommit::OnEnter)
 	{
 		if(OnGetSelectedBlackboardItemIndex.IsBound())
@@ -160,7 +165,7 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	{
 		return;
 	}
-
+	
 	TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
 	FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 	const FBlackboardEntryIdentifier OldIdentifier(CurrentEntry);
@@ -180,6 +185,10 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 		CurrentEntry.EntryName = FName(*InName.ToString());
 	}
 
+	TSharedPtr<IPropertyHandle> KeyHandle = KeysPropertyHandleCached->GetChildHandle(static_cast<uint32>(CurrentCategorySelection));
+	TSharedPtr<IPropertyHandle> EntryNameProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, EntryName));
+	EntryNameProperty->NotifyPostChange(EPropertyChangeType::ValueSet);
+
 	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
 	if (BlackboardView.IsValid())
 	{
@@ -189,6 +198,11 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 
 void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType)
 {
+	if (!KeysPropertyHandleCached.IsValid())
+	{
+		return;
+	}
+	
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
 	check(BEBlackboardData != nullptr);
 
@@ -204,15 +218,17 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 	{
 		return;
 	}
-
+	
 	const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BEBlackboardData->ParentKeys : BEBlackboardData->Keys;
 	const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
-	
+
 	if (BEBlackboardData->Categories.Contains(Identifier))
 	{
 		BEBlackboardData->Categories.Add(Identifier, InCategory);
 	}
+
+	KeysPropertyHandleCached->NotifyPostChange(EPropertyChangeType::ValueSet);
 
 	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
 	if (BlackboardView.IsValid())

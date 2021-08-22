@@ -19,6 +19,7 @@ public:
 		: OnGetSelectedBlackboardItemIndex(InOnGetSelectedBlackboardItemIndex)
 		, BlackboardViewCached(InBlackboardView)
 		, BlackboardDataCached(nullptr)
+		, KeysPropertyHandleCached(nullptr)
 		, CurrentCategorySelection(-1)
 	{}
 
@@ -30,7 +31,6 @@ public:
 
 private:
 	void HandleOnCommittedEntryName(const FText& InName, ETextCommit::Type CommitType);
-	
 	void HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType);
 
 private:
@@ -39,6 +39,7 @@ private:
 
 	TWeakPtr<SBehaviorTreeBlackboardView> BlackboardViewCached;
 	TWeakObjectPtr<UBlackboardData> BlackboardDataCached;
+	TSharedPtr<IPropertyHandle> KeysPropertyHandleCached;
 	
 	int32 CurrentCategorySelection;
 	bool bIsInheritedSelection;
