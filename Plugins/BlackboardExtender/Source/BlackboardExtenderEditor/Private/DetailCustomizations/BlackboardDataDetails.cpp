@@ -22,10 +22,9 @@ TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(TWeakPtr<S
 void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayout )
 {
 	// First hide all keys
-	//DetailLayout.HideCategory(TEXT("Blackboard"));
+	DetailLayout.HideCategory(TEXT("BlackboardCategory"));
 	DetailLayout.HideProperty(TEXT("Keys"));
 	DetailLayout.HideProperty(TEXT("ParentKeys"));
-	//DetailLayout.HideProperty(TEXT("Categories"));
 
 	TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailLayout.GetSelectedObjects();
 	if (SelectedObjects.Num() > 0)
@@ -74,7 +73,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 			.ValueContent()
 			[
 				SNew(SHorizontalBox)
-				.IsEnabled(true)
+				.IsEnabled(!bIsInherited)
 				+SHorizontalBox::Slot()
 				[
 					//EntryNameProperty->CreatePropertyValueWidget()
@@ -112,6 +111,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 				.ValueContent()
 				[
 					SNew(SHorizontalBox)
+					.IsEnabled(!bIsInherited)
 					+SHorizontalBox::Slot()
 					.FillWidth(1.0f)
 					[
