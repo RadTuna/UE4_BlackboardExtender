@@ -56,13 +56,14 @@ FName FEdGraphSchemaAction_BlackboardEntry::GetTypeId() const
 	return StaticGetTypeId(); 
 }
 
-FEdGraphSchemaAction_BlackboardEntry::FEdGraphSchemaAction_BlackboardEntry(UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited)
+FEdGraphSchemaAction_BlackboardEntry::FEdGraphSchemaAction_BlackboardEntry(TWeakPtr<class SBehaviorTreeBlackboardView> InBlackboardView, UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited)
 	: FEdGraphSchemaAction_Dummy()
 	, BlackboardData(InBlackboardData)
 	, Key(InKey)
 	, bIsInherited(bInIsInherited)
 	, bIsNew(false)
 	, Category(InCategory)
+	, BlackboardViewCached(InBlackboardView)
 {
 	check(BlackboardData);
 	Update();
@@ -83,7 +84,7 @@ FReply SBehaviorTreeBlackboardView::HandleOnDraggedAction(const TArray<TSharedPt
 	{
 		if (InAction->GetTypeId() == FEdGraphSchemaAction_BlackboardEntry::StaticGetTypeId())
 		{
-			FEdGraphSchemaAction_BlackboardEntry* Action = reinterpret_cast<FEdGraphSchemaAction_BlackboardEntry*>(InAction.Get());
+			FEdGraphSchemaAction_BlackboardEntry* Action = static_cast<FEdGraphSchemaAction_BlackboardEntry*>(InAction.Get());
 			UClass* EntryClass = Action->GetEntryUClass();
 			if (EntryClass != nullptr)
 			{
@@ -100,6 +101,90 @@ void FEdGraphSchemaAction_BlackboardEntry::Update()
 {
 	UpdateSearchData(FText::FromName(Key.EntryName), FText::Format(LOCTEXT("BlackboardEntryFormat", "{0} '{1}'"), Key.KeyType ? Key.KeyType->GetClass()->GetDisplayNameText() : LOCTEXT("NullKeyDesc", "None"), FText::FromName(Key.EntryName)), Category, FText());
 	SectionID = bIsInherited ? EBlackboardSectionTitles::InheritedKeys : EBlackboardSectionTitles::Keys;
+	Grouping = 1;
+}
+
+void FEdGraphSchemaAction_BlackboardEntry::MovePersistentItemToCategory(const FText& NewCategoryName)
+{
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+	check(BEBlackboardData != nullptr);
+
+	const FBlackboardEntryIdentifier Identifier(Key);
+	BEBlackboardData->AddUniqueCategory(Identifier, NewCategoryName, bIsInherited);
+	
+	FProperty* Property = UBEBlackboardData::StaticClass()->FindPropertyByName(TEXT("Categories"));
+	check(Property != nullptr);
+	FPropertyChangedEvent PropertyChangedEvent(Property, EPropertyChangeType::ValueSet);
+	BEBlackboardData->PostEditChangeProperty(PropertyChangedEvent);
+
+	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
+	if (BlackboardView.IsValid())
+	{
+		BlackboardView->RefreshGraphActionMenuItems();
+	}
+}
+
+int32 FEdGraphSchemaAction_BlackboardEntry::GetReorderIndexInContainer() const
+{
+	TArray<FBlackboardEntry> Keys = bIsInherited ? BlackboardData->ParentKeys : BlackboardData->Keys;
+	
+	if (Keys.Num() > 0)
+	{
+		for (int32 Index = 0; Keys.Num(); ++Index)
+		{
+			if (Keys[Index].EntryName == Key.EntryName)
+			{
+				return Index;
+			}
+		}
+	}
+	
+	return INDEX_NONE;
+}
+
+bool FEdGraphSchemaAction_BlackboardEntry::ReorderToBeforeAction(TSharedRef<FEdGraphSchemaAction> OtherAction)
+{
+	if (OtherAction->GetPersistentItemDefiningObject() == GetPersistentItemDefiningObject())
+	{
+		FEdGraphSchemaAction_BlackboardEntry* TargetAction = static_cast<FEdGraphSchemaAction_BlackboardEntry*>(&OtherAction.Get());
+		const FName TargetEntryName = TargetAction->GetEntryName();
+		if (BlackboardData != nullptr
+			&& TargetEntryName != GetEntryName()
+			&& BlackboardData == TargetAction->BlackboardData
+			&& bIsInherited == TargetAction->bIsInherited)
+		{
+			int32 FromIndex = GetReorderIndexInContainer();
+			int32 TargetIndex = TargetAction->GetReorderIndexInContainer();
+
+			if (TargetIndex > FromIndex)
+			{
+				--TargetIndex;
+			}
+
+			if (bIsInherited)
+			{
+				const FBlackboardEntry SaveEntry = BlackboardData->ParentKeys[FromIndex];
+				BlackboardData->ParentKeys.RemoveAt(FromIndex);
+				BlackboardData->ParentKeys.Insert(SaveEntry, TargetIndex);
+			}
+			else
+			{
+				const FBlackboardEntry SaveEntry = BlackboardData->Keys[FromIndex];
+				BlackboardData->Keys.RemoveAt(FromIndex);
+				BlackboardData->Keys.Insert(SaveEntry, TargetIndex);
+			}
+
+			MovePersistentItemToCategory(TargetAction->Category);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+FEdGraphSchemaActionDefiningObject FEdGraphSchemaAction_BlackboardEntry::GetPersistentItemDefiningObject() const
+{
+	return FEdGraphSchemaActionDefiningObject(BlackboardData);
 }
 
 class SBehaviorTreeBlackboardItem : public SGraphPaletteItem
@@ -577,12 +662,13 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 			FText Category = FText::GetEmpty();
 			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
 			const FBlackboardEntryIdentifier Identifier(ParentKey);
-			if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(Identifier))
+			if (BEBlackboardData != nullptr && BEBlackboardData->ParentCategories.Contains(Identifier))
 			{
-				Category = *BEBlackboardData->Categories.Find(Identifier);
+				Category = BEBlackboardData->GetUniqueCategory(Identifier, true);
 			}
-			
-			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, ParentKey, Category, true)) );
+
+			TWeakPtr<SBehaviorTreeBlackboardView> BlackboardView = SharedThis(this);
+			GraphActionListBuilder.AddAction(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, ParentKey, Category, true)));
 		}
 
 		for(auto& Key : BlackboardData->Keys)
@@ -592,10 +678,11 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 			const FBlackboardEntryIdentifier Identifier(Key);
 			if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(Identifier))
 			{
-				Category = *BEBlackboardData->Categories.Find(Identifier);
+				Category = BEBlackboardData->GetUniqueCategory(Identifier, false);
 			}
-			
-			GraphActionListBuilder.AddAction( MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardData, Key, Category, false)) );
+
+			TWeakPtr<SBehaviorTreeBlackboardView> BlackboardView = SharedThis(this);
+			GraphActionListBuilder.AddAction(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, Key, Category, false)));
 		}
 	}
 }

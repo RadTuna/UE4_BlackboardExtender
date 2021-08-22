@@ -54,10 +54,30 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 {
 	GENERATED_UCLASS_BODY()
 
+	virtual void PostInitProperties() override;
+	virtual void PostLoad() override;
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+	void AddUniqueCategory(const FBlackboardEntryIdentifier& Identifier, const FText& InCategory, bool bIsInheritKey);
+	FText GetUniqueCategory(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey);
+
+private:
+	void UpdateParentCategories();
+	void PropagateChangeCategories();
+
+	void CleanUpCategoryMap();
+	
+public:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, Category=Blackboard)
+	UPROPERTY(EditAnywhere, Category=BlackboardCategory)
+	TMap<FBlackboardEntryIdentifier, FText> ParentCategories;
+	
+	UPROPERTY(EditAnywhere, Category=BlackboardCategory)
 	TMap<FBlackboardEntryIdentifier, FText> Categories;
 
-	TMap<FString, FText> CategoryMap;
+	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
+	TMap<FString, FText> CategoryFilter;
 #endif
 };

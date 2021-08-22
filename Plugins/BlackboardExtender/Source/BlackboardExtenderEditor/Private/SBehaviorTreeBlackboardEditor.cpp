@@ -296,7 +296,7 @@ void SBehaviorTreeBlackboardEditor::HandleKeyClassPicked(UClass* InClass)
 	if (BEBlackboardData != nullptr)
 	{
 		const FBlackboardEntryIdentifier Identifier(Entry);
-		BEBlackboardData->Categories.Add(Identifier, LOCTEXT("BlackboardCategory", ""));
+		BEBlackboardData->AddUniqueCategory(Identifier, LOCTEXT("BlackboardCategory", ""), false);
 	}
 	BlackboardData->Keys.Add(Entry);
 

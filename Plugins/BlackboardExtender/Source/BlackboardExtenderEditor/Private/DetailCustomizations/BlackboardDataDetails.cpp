@@ -22,10 +22,10 @@ TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(TWeakPtr<S
 void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayout )
 {
 	// First hide all keys
-	DetailLayout.HideCategory(TEXT("Blackboard"));
+	//DetailLayout.HideCategory(TEXT("Blackboard"));
 	DetailLayout.HideProperty(TEXT("Keys"));
 	DetailLayout.HideProperty(TEXT("ParentKeys"));
-	DetailLayout.HideProperty(TEXT("Categories"));
+	//DetailLayout.HideProperty(TEXT("Categories"));
 
 	TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailLayout.GetSelectedObjects();
 	if (SelectedObjects.Num() > 0)
@@ -99,40 +99,32 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 			if (BEBlackboardData != nullptr)
 			{
 				const FBlackboardEntryIdentifier Identifier(CurrentEntry);
-				const FText* CurrentCategory = nullptr;
-				if (BEBlackboardData->Categories.Contains(Identifier))
-				{
-					CurrentCategory = BEBlackboardData->Categories.Find(Identifier);
-				}
-
-				if (CurrentCategory != nullptr)
-				{
-					const FText CategoryRowName = LOCTEXT("EntryCategory", "Category");
-					DetailCategoryBuilder.AddCustomRow(CategoryRowName)
-					.NameContent()
+				const FText CurrentCategory = BEBlackboardData->GetUniqueCategory(Identifier, bIsInherited);
+				const FText CategoryRowName = LOCTEXT("EntryCategory", "Category");
+				DetailCategoryBuilder.AddCustomRow(CategoryRowName)
+				.NameContent()
+				[
+					SNew(STextBlock)
+					.SimpleTextMode(true)
+					.Font(FontStyle)
+					.Text(CategoryRowName)
+				]
+				.ValueContent()
+				[
+					SNew(SHorizontalBox)
+					+SHorizontalBox::Slot()
+					.FillWidth(1.0f)
 					[
-						SNew(STextBlock)
-						.SimpleTextMode(true)
+						SNew(SEditableTextBox)
+						.Text(CurrentCategory)
 						.Font(FontStyle)
-						.Text(CategoryRowName)
+						.SelectAllTextWhenFocused(true)
+						.ClearKeyboardFocusOnCommit(false)
+						.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedCategory)
+						.SelectAllTextOnCommit(true)
+						.IsReadOnly(false)
 					]
-					.ValueContent()
-					[
-						SNew(SHorizontalBox)
-						+SHorizontalBox::Slot()
-						.FillWidth(1.0f)
-						[
-							SNew(SEditableTextBox)
-							.Text(*CurrentCategory)
-							.Font(FontStyle)
-							.SelectAllTextWhenFocused(true)
-							.ClearKeyboardFocusOnCommit(false)
-							.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedCategory)
-							.SelectAllTextOnCommit(true)
-							.IsReadOnly(false)
-						]
-					];
-				}
+				];
 			}
 #endif
 
@@ -173,12 +165,12 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
 	if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(OldIdentifier))
 	{
-		const FText Category = *BEBlackboardData->Categories.Find(OldIdentifier);
+		const FText CategoryKey = *BEBlackboardData->Categories.Find(OldIdentifier);
 		BEBlackboardData->Categories.Remove(OldIdentifier);
 		CurrentEntry.EntryName = FName(*InName.ToString());
 		
 		const FBlackboardEntryIdentifier NewIdentifier(CurrentEntry);
-		BEBlackboardData->Categories.Add(NewIdentifier, Category);
+		BEBlackboardData->Categories.Add(NewIdentifier, CategoryKey);
 	}
 	else
 	{
@@ -222,21 +214,7 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 	const TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BEBlackboardData->ParentKeys : BEBlackboardData->Keys;
 	const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
-
-	if (BEBlackboardData->Categories.Contains(Identifier))
-	{
-		FText NewCategory = InCategory;
-		if (BEBlackboardData->CategoryMap.Contains(NewCategory.ToString()))
-		{
-			NewCategory = *BEBlackboardData->CategoryMap.Find(NewCategory.ToString());
-		}
-		else
-		{
-			BEBlackboardData->CategoryMap.Add(NewCategory.ToString(), NewCategory);
-		}
-		
-		BEBlackboardData->Categories.Add(Identifier, InCategory);
-	}
+	BEBlackboardData->AddUniqueCategory(Identifier, InCategory, bIsInheritedSelection);
 
 	KeysPropertyHandleCached->NotifyPostChange(EPropertyChangeType::ValueSet);
 

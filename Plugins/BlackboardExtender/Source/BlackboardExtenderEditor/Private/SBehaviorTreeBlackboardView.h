@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SBehaviorTreeBlackboardView.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "UObject/GCObject.h"
 #include "Layout/Visibility.h"
@@ -47,7 +48,7 @@ public:
 	static FName StaticGetTypeId();
 	virtual FName GetTypeId() const;
 
-	FEdGraphSchemaAction_BlackboardEntry(UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited);
+	FEdGraphSchemaAction_BlackboardEntry(TWeakPtr<class SBehaviorTreeBlackboardView> InBlackboardView, UBlackboardData* InBlackboardData, FBlackboardEntry& InKey, const FText& InCategory, bool bInIsInherited);
 
 	void Update();
 
@@ -65,6 +66,8 @@ public:
 
 	FText Category;
 
+	TWeakPtr<class SBehaviorTreeBlackboardView> BlackboardViewCached;
+
 public:
 	FName GetEntryName() const
 	{
@@ -75,6 +78,14 @@ public:
 	{
 		return BlackboardData->GetClass();
 	}
+
+	// FEdGraphSchemaAction Interface
+	virtual void MovePersistentItemToCategory(const FText& NewCategoryName) override;
+	virtual int32 GetReorderIndexInContainer() const override;
+	virtual bool ReorderToBeforeAction(TSharedRef<FEdGraphSchemaAction> OtherAction) override;
+	virtual FEdGraphSchemaActionDefiningObject GetPersistentItemDefiningObject() const override;
+
+	virtual bool IsParentable() const override { return true; }
 	
 };
 
