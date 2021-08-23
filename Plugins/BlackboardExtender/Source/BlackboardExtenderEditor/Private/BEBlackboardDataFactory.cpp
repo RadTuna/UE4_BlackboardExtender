@@ -1,12 +1,12 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 // Primary Include
-#include "BlackboardDataV2Factory.h"
+#include "BEBlackboardDataFactory.h"
 
 // User Include
 #include "BEBlackboardData.h"
 
-UBlackboardDataV2Factory::UBlackboardDataV2Factory(const FObjectInitializer& ObjectInitializer)
+UBEBlackboardDataFactory::UBEBlackboardDataFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	SupportedClass = UBEBlackboardData::StaticClass();
@@ -14,13 +14,13 @@ UBlackboardDataV2Factory::UBlackboardDataV2Factory(const FObjectInitializer& Obj
 	bEditAfterNew = true;
 }
 
-UObject* UBlackboardDataV2Factory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+UObject* UBEBlackboardDataFactory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
 	check(InClass->IsChildOf(UBEBlackboardData::StaticClass()));
 	return NewObject<UBEBlackboardData>(InParent, InClass, InName, Flags);
 }
 
-bool UBlackboardDataV2Factory::CanCreateNew() const
+bool UBEBlackboardDataFactory::CanCreateNew() const
 {
 	return true;
 }

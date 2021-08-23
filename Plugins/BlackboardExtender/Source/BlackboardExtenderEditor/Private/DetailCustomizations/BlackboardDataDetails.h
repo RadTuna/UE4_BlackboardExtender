@@ -20,7 +20,7 @@ public:
 		, BlackboardViewCached(InBlackboardView)
 		, BlackboardDataCached(nullptr)
 		, KeysPropertyHandleCached(nullptr)
-		, CurrentCategorySelection(-1)
+		, CurrentCategorySelection(INDEX_NONE)
 	{}
 
 	/** Makes a new instance of this detail layout class for a specific detail view requesting it */
@@ -31,6 +31,7 @@ public:
 
 private:
 	void HandleOnCommittedEntryName(const FText& InName, ETextCommit::Type CommitType);
+	bool HandleOnVerifyEntryNameChanged(const FText& InNewText, FText& OutErrorMessage);
 	void HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType);
 
 private:

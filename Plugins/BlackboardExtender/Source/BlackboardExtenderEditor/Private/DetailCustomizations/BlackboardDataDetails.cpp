@@ -83,6 +83,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 					.SelectAllTextWhenFocused(true)
 					.ClearKeyboardFocusOnCommit(false)
 					.OnTextCommitted(this, &FBlackboardDataDetails::HandleOnCommittedEntryName)
+					.OnVerifyTextChanged(this, &FBlackboardDataDetails::HandleOnVerifyEntryNameChanged)
 					.SelectAllTextOnCommit(true)
 					.IsReadOnly(false)
 				]
@@ -186,6 +187,43 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	{
 		BlackboardView->RefreshGraphActionMenuItems();
 	}
+}
+
+bool FBlackboardDataDetails::HandleOnVerifyEntryNameChanged(const FText& InNewText, FText& OutErrorMessage)
+{
+	check(BlackboardDataCached != nullptr);
+	if (CurrentCategorySelection < 0)
+	{
+		OutErrorMessage = FText::GetEmpty();
+		return false;
+	}
+
+	TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
+	FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
+
+	UBlackboardData* BlackboardData = BlackboardDataCached.Get();
+	if (BlackboardData != nullptr)
+	{
+		for (const FBlackboardEntry& ParentEntry : BlackboardData->ParentKeys)
+		{
+			if (ParentEntry.EntryName == FName(*InNewText.ToString()))
+			{
+				OutErrorMessage = LOCTEXT("ParentBlackboardEntryErrorMessage", "Duplicate name in Parent Blackboard Entry.");
+				return false;
+			}
+		}
+		for (const FBlackboardEntry& Entry : BlackboardData->Keys)
+		{
+			if (Entry.EntryName == FName(*InNewText.ToString()))
+			{
+				OutErrorMessage = LOCTEXT("BlackboardEntryErrorMessage", "Duplicate name in Blackboard Entry.");
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType)

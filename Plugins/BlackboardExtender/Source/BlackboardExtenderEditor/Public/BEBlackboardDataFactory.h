@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Factories/Factory.h"
-#include "BlackboardDataV2Factory.generated.h"
+#include "BEBlackboardDataFactory.generated.h"
 
 UCLASS()
-class BLACKBOARDEXTENDEREDITOR_API UBlackboardDataV2Factory : public UFactory
+class BLACKBOARDEXTENDEREDITOR_API UBEBlackboardDataFactory : public UFactory
 {
 	GENERATED_UCLASS_BODY()
 	
