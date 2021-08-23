@@ -56,9 +56,13 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 	void AddUniqueCategory(const FBlackboardEntryIdentifier& Identifier, const FText& InCategory, bool bIsInheritKey);
 	FText GetUniqueCategory(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey);
 
+#if WITH_EDITOR
+	bool CompareOrderFromIdentifier(const FBlackboardEntryIdentifier& InA, const FBlackboardEntryIdentifier& InB, bool bIsInherit);
+#endif
+
 private:
-	void UpdateParentCategories();
-	void PropagateChangeCategories();
+	void UpdateParentElements();
+	void PropagateChangeElements();
 
 	void CleanUpCategoryMap();
 	
@@ -72,5 +76,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
 	TMap<FString, FText> CategoryFilter;
+
+	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
+	TArray<FBlackboardEntryIdentifier> ParentKeysOrder;
+
+	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
+	TArray<FBlackboardEntryIdentifier> KeysOrder;
 #endif
 };

@@ -126,19 +126,23 @@ void FEdGraphSchemaAction_BlackboardEntry::MovePersistentItemToCategory(const FT
 
 int32 FEdGraphSchemaAction_BlackboardEntry::GetReorderIndexInContainer() const
 {
-	TArray<FBlackboardEntry> Keys = bIsInherited ? BlackboardData->ParentKeys : BlackboardData->Keys;
-	
-	if (Keys.Num() > 0)
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+	if (BEBlackboardData == nullptr)
 	{
-		for (int32 Index = 0; Keys.Num(); ++Index)
-		{
-			if (Keys[Index].EntryName == Key.EntryName)
-			{
-				return Index;
-			}
-		}
+		return INDEX_NONE;
 	}
 	
+	const TArray<FBlackboardEntryIdentifier>& OrderList = bIsInherited ? BEBlackboardData->ParentKeysOrder : BEBlackboardData->KeysOrder;
+	const FBlackboardEntryIdentifier Identifier(Key);
+
+	for (int32 Index = 0; Index < OrderList.Num(); ++Index)
+	{
+		if (Identifier == OrderList[Index])
+		{
+			return Index;
+		}
+	}
+
 	return INDEX_NONE;
 }
 
@@ -146,33 +150,26 @@ bool FEdGraphSchemaAction_BlackboardEntry::ReorderToBeforeAction(TSharedRef<FEdG
 {
 	if (OtherAction->GetPersistentItemDefiningObject() == GetPersistentItemDefiningObject())
 	{
+		UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
 		FEdGraphSchemaAction_BlackboardEntry* TargetAction = static_cast<FEdGraphSchemaAction_BlackboardEntry*>(&OtherAction.Get());
 		const FName TargetEntryName = TargetAction->GetEntryName();
-		if (BlackboardData != nullptr
+		if (BEBlackboardData != nullptr
 			&& TargetEntryName != GetEntryName()
 			&& BlackboardData == TargetAction->BlackboardData
+			&& !bIsInherited
 			&& bIsInherited == TargetAction->bIsInherited)
 		{
-			int32 FromIndex = GetReorderIndexInContainer();
+			const int32 FromIndex = GetReorderIndexInContainer();
 			int32 TargetIndex = TargetAction->GetReorderIndexInContainer();
 
 			if (TargetIndex > FromIndex)
 			{
 				--TargetIndex;
 			}
-
-			if (bIsInherited)
-			{
-				const FBlackboardEntry SaveEntry = BlackboardData->ParentKeys[FromIndex];
-				BlackboardData->ParentKeys.RemoveAt(FromIndex);
-				BlackboardData->ParentKeys.Insert(SaveEntry, TargetIndex);
-			}
-			else
-			{
-				const FBlackboardEntry SaveEntry = BlackboardData->Keys[FromIndex];
-				BlackboardData->Keys.RemoveAt(FromIndex);
-				BlackboardData->Keys.Insert(SaveEntry, TargetIndex);
-			}
+			
+			const FBlackboardEntryIdentifier SaveIdentifier = BEBlackboardData->KeysOrder[FromIndex];
+			BEBlackboardData->KeysOrder.RemoveAt(FromIndex);
+			BEBlackboardData->KeysOrder.Insert(SaveIdentifier, TargetIndex);
 
 			MovePersistentItemToCategory(TargetAction->Category);
 			return true;
@@ -637,7 +634,7 @@ void SBehaviorTreeBlackboardView::Construct(const FArguments& InArgs, TSharedRef
 				.OnActionDragged(this, &SBehaviorTreeBlackboardView::HandleOnDraggedAction)
 				.OnContextMenuOpening(this, &SBehaviorTreeBlackboardView::HandleContextMenuOpening, InCommandList)
 				.OnActionMatchesName(this, &SBehaviorTreeBlackboardView::HandleActionMatchesName)
-				.AlphaSortItems(GetDefault<UEditorPerProjectUserSettings>()->bDisplayBlackboardKeysInAlphabeticalOrder)
+				.AlphaSortItems(false)
 				.AutoExpandActionMenu(true)
 			]
 		]
@@ -657,10 +654,12 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 {
 	if(BlackboardData != nullptr)
 	{
+		UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+		
+		TArray<TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>> AllParentActions;
 		for(auto& ParentKey : BlackboardData->ParentKeys)
 		{
 			FText Category = FText::GetEmpty();
-			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
 			const FBlackboardEntryIdentifier Identifier(ParentKey);
 			if (BEBlackboardData != nullptr && BEBlackboardData->ParentCategories.Contains(Identifier))
 			{
@@ -668,13 +667,22 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 			}
 
 			TWeakPtr<SBehaviorTreeBlackboardView> BlackboardView = SharedThis(this);
-			GraphActionListBuilder.AddAction(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, ParentKey, Category, true)));
+			AllParentActions.Add(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, ParentKey, Category, true)));
+		}
+		if (BEBlackboardData != nullptr)
+		{
+			AllParentActions.Sort([BEBlackboardData](const TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>& A, const TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>& B)
+			{
+				const FBlackboardEntryIdentifier IdentifierA(A->Key);
+				const FBlackboardEntryIdentifier IdentifierB(B->Key);
+				return BEBlackboardData->CompareOrderFromIdentifier(IdentifierA, IdentifierB, true);
+			});
 		}
 
+		TArray<TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>> AllActions;
 		for(auto& Key : BlackboardData->Keys)
 		{
 			FText Category = FText::GetEmpty();
-			UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
 			const FBlackboardEntryIdentifier Identifier(Key);
 			if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(Identifier))
 			{
@@ -682,7 +690,28 @@ void SBehaviorTreeBlackboardView::HandleCollectAllActions( FGraphActionListBuild
 			}
 
 			TWeakPtr<SBehaviorTreeBlackboardView> BlackboardView = SharedThis(this);
-			GraphActionListBuilder.AddAction(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, Key, Category, false)));
+			AllActions.Add(MakeShareable(new FEdGraphSchemaAction_BlackboardEntry(BlackboardView, BlackboardData, Key, Category, false)));
+		}
+		if (BEBlackboardData != nullptr)
+		{
+			AllActions.Sort([BEBlackboardData](const TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>& A, const TSharedPtr<FEdGraphSchemaAction_BlackboardEntry>& B)
+			{
+				const FBlackboardEntryIdentifier IdentifierA(A->Key);
+				const FBlackboardEntryIdentifier IdentifierB(B->Key);
+				return BEBlackboardData->CompareOrderFromIdentifier(IdentifierA, IdentifierB, false);
+			});
+		}
+
+		if (AllParentActions.Num() > 0 || AllActions.Num() > 0)
+		{
+			TArray<TSharedPtr<FEdGraphSchemaAction>> TotalActions;
+			TotalActions.Append(AllParentActions);
+			TotalActions.Append(AllActions);
+		
+			for (TSharedPtr<FEdGraphSchemaAction>& Action : TotalActions)
+			{
+				GraphActionListBuilder.AddAction(Action);
+			}
 		}
 	}
 }

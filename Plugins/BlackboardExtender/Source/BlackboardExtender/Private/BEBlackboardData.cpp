@@ -14,7 +14,7 @@ void UBEBlackboardData::PostInitProperties()
 {
 	Super::PostInitProperties();
 	
-	UpdateParentCategories();
+	UpdateParentElements();
 	CleanUpCategoryMap();
 }
 
@@ -22,15 +22,15 @@ void UBEBlackboardData::PostLoad()
 {
 	Super::PostLoad();
 	
-	UpdateParentCategories();
+	UpdateParentElements();
 	CleanUpCategoryMap();
 }
 
 #if WITH_EDITOR
 void UBEBlackboardData::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	UpdateParentCategories();
-	PropagateChangeCategories();
+	UpdateParentElements();
+	PropagateChangeElements();
 	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
@@ -67,7 +67,43 @@ FText UBEBlackboardData::GetUniqueCategory(const FBlackboardEntryIdentifier& Ide
 	return OutCategory;
 }
 
-void UBEBlackboardData::UpdateParentCategories()
+#if WITH_EDITOR
+bool UBEBlackboardData::CompareOrderFromIdentifier(const FBlackboardEntryIdentifier& InA, const FBlackboardEntryIdentifier& InB, bool bIsInherit)
+{
+	const TArray<FBlackboardEntryIdentifier> OrderList = bIsInherit ? ParentKeysOrder : KeysOrder;
+	int32 IndexA = INDEX_NONE;
+	for (int32 Index = 0; Index < OrderList.Num(); ++Index)
+	{
+		if (InA == OrderList[Index])
+		{
+			IndexA = Index;
+			break;
+		}
+	}
+	if (IndexA == INDEX_NONE)
+	{
+		return false;
+	}
+
+	int32 IndexB = INDEX_NONE;
+	for (int32 Index = 0; Index < OrderList.Num(); ++Index)
+	{
+		if (InB == OrderList[Index])
+		{
+			IndexB = Index;
+			break;
+		}
+	}
+	if (IndexB == INDEX_NONE)
+	{
+		return true;
+	}
+
+	return IndexA < IndexB;
+}
+#endif
+
+void UBEBlackboardData::UpdateParentElements()
 {
 	if (Parent == nullptr)
 	{
@@ -83,18 +119,22 @@ void UBEBlackboardData::UpdateParentCategories()
 			ParentCategories.Append(ParentBlackboard->Categories);
 			
 			CategoryFilter.Append(ParentBlackboard->CategoryFilter);
+
+			ParentKeysOrder.Empty();
+			ParentKeysOrder.Append(ParentBlackboard->ParentKeysOrder);
+			ParentKeysOrder.Append(ParentBlackboard->KeysOrder);
 		}
 	}
 }
 
-void UBEBlackboardData::PropagateChangeCategories()
+void UBEBlackboardData::PropagateChangeElements()
 {
 	for (TObjectIterator<UBEBlackboardData> It; It; ++It)
 	{
 		if (It->Parent == this)
 		{
-			It->UpdateParentCategories();
-			It->PropagateChangeCategories();
+			It->UpdateParentElements();
+			It->PropagateChangeElements();
 		}
 	}
 }

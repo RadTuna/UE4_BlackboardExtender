@@ -291,13 +291,15 @@ void SBehaviorTreeBlackboardEditor::HandleKeyClassPicked(UClass* InClass)
 	FBlackboardEntry Entry;
 	Entry.EntryName = FName(*NewKeyName);
 	Entry.KeyType = NewObject<UBlackboardKeyType>(BlackboardData, InClass);
-
+	
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
 	if (BEBlackboardData != nullptr)
 	{
 		const FBlackboardEntryIdentifier Identifier(Entry);
 		BEBlackboardData->AddUniqueCategory(Identifier, LOCTEXT("BlackboardCategory", ""), false);
+		BEBlackboardData->KeysOrder.Add(Identifier);
 	}
+
 	BlackboardData->Keys.Add(Entry);
 
 	GraphActionMenu->RefreshAllActions(true);

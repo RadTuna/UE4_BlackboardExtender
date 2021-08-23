@@ -3,6 +3,9 @@
 // Primary Include
 #include "BlackboardEntryDragDropAction.h"
 
+// User Include
+#include "SBehaviorTreeBlackboardView.h"
+
 
 #define LOCTEXT_NAMESPACE "FBlackboardEntryDragDropAction"
 
@@ -98,6 +101,24 @@ void FBlackboardEntryDragDropAction::HoverTargetChanged()
 			else
 			{
 				SetFeedbackMessageError(FText::Format(LOCTEXT("ReorderActionDifferentAction", "Cannot reorder '{DraggedDisplayName}' into a different section."), Args));
+			}
+
+			TSharedPtr<FEdGraphSchemaAction_BlackboardEntry> BlackboardHoveredAction = StaticCastSharedPtr<FEdGraphSchemaAction_BlackboardEntry>(HoveredActionPtr);
+			if (BlackboardHoveredAction.IsValid())
+			{
+				if (BlackboardHoveredAction->bIsInherited)
+				{
+					SetFeedbackMessageError(FText::Format(LOCTEXT("CannotMoveToInheritEntry", "Cannot move to inherited Blackboard Entry"), Args));
+				}
+			}
+
+			TSharedPtr<FEdGraphSchemaAction_BlackboardEntry> BlackboardSourceAction = StaticCastSharedPtr<FEdGraphSchemaAction_BlackboardEntry>(SourceAction);
+			if (BlackboardSourceAction.IsValid())
+			{
+				if (BlackboardSourceAction->bIsInherited)
+				{
+					SetFeedbackMessageError(FText::Format(LOCTEXT("CannotMoveFromInheritEntry", "Cannot move from inherited Blackboard Entry"), Args));
+				}
 			}
 
 			return;

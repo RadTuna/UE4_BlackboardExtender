@@ -22,7 +22,7 @@ TSharedRef<IDetailCustomization> FBlackboardDataDetails::MakeInstance(TWeakPtr<S
 void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayout )
 {
 	// First hide all keys
-	DetailLayout.HideCategory(TEXT("BlackboardCategory"));
+	//DetailLayout.HideCategory(TEXT("BlackboardCategory"));
 	DetailLayout.HideProperty(TEXT("Keys"));
 	DetailLayout.HideProperty(TEXT("ParentKeys"));
 
