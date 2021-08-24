@@ -1,11 +1,11 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright RadTuna. All Rights Reserved.
 
 // Primary Include
 #include "AssetTypeActions_ExtendBlackboard.h"
 
 // Engine Include
 #include "AIModule.h"
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 #include "BehaviorTreeEditor/Public/BehaviorTreeEditorModule.h"
 
 // User Include

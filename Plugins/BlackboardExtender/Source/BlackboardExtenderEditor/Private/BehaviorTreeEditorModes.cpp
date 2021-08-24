@@ -4,6 +4,7 @@
 #include "BehaviorTreeEditorTabs.h"
 #include "BehaviorTreeEditorTabFactories.h"
 #include "BehaviorTreeEditorToolbar.h"
+#include "BlackboardConstantEditor.h"
 
 /////////////////////////////////////////////////////
 // FBehaviorTreeEditorApplicationMode

@@ -35,7 +35,7 @@
 #include "ScopedTransaction.h"
 #include "BehaviorTreeColors.h"
 
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 #include "BehaviorTree/BTCompositeNode.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BehaviorTree.h"

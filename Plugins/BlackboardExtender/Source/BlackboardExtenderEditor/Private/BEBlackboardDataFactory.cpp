@@ -6,6 +6,7 @@
 // User Include
 #include "BEBlackboardData.h"
 
+
 UBEBlackboardDataFactory::UBEBlackboardDataFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {

@@ -11,3 +11,7 @@ const FName FBehaviorTreeEditorTabs::BlackboardDetailsID(TEXT("BehaviorTreeEdito
 
 // Document tab identifiers
 const FName FBehaviorTreeEditorTabs::GraphEditorID(TEXT("Document"));
+
+
+// Tab identifiers
+const FName FBlackboardConstantEditorTabs::DetailsID(TEXT("BlackboardConstantEditor_Details"));

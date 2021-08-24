@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright RadTuna. All Rights Reserved.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "GraphEditorDragDropAction.h"
 
 
-class BLACKBOARDEXTENDEREDITOR_API FBlackboardEntryDragDropAction : public FGraphSchemaActionDragDropAction
+class FBlackboardEntryDragDropAction : public FGraphSchemaActionDragDropAction
 {
 public:
 	DRAG_DROP_OPERATOR_TYPE(FMyBlueprintItemDragDropAction, FGraphSchemaActionDragDropAction)

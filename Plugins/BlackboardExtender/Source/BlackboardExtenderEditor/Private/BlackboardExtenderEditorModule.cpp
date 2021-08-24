@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 // Primary Include
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 
 // Engine Include
 #include "AssetToolsModule.h"
@@ -20,11 +20,13 @@
 #include "AssetTypeActions/AssetTypeActions_ExtendBehaviorTree.h"
 #include "AssetTypeActions/AssetTypeActions_ExtendBlackboard.h"
 #include "BehaviorTreeEditor.h"
+#include "BlackboardConstantEditor.h"
 #include "DetailCustomizations/BehaviorDecoratorDetails.h"
 #include "DetailCustomizations/BlackboardDecoratorDetails.h"
 #include "DetailCustomizations/BlackboardSelectorDetails.h"
 #include "SGraphNode_BehaviorTree.h"
 #include "SGraphNode_Decorator.h"
+#include "AssetTypeActions/AssetTypeActions_BlackboardConstant.h"
 
 
 #define LOCTEXT_NAMESPACE "FBlackboardExtenderEditorModule"
@@ -76,6 +78,10 @@ void FBlackboardExtenderEditorModule::StartupModule()
 	AssetTypeActionsList.Add(BlackboardAssetTypeActions);
 	AssetToolsModule.RegisterAssetTypeActions(BlackboardAssetTypeActions.ToSharedRef());
 
+	TSharedPtr<FAssetTypeActions_BlackboardConstant> BlackboardConstantAssetTypeActions = MakeShared<FAssetTypeActions_BlackboardConstant>();
+	AssetTypeActionsList.Add(BlackboardConstantAssetTypeActions);
+	AssetToolsModule.RegisterAssetTypeActions(BlackboardConstantAssetTypeActions.ToSharedRef());
+
 	// Unregister the details customizer
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyModule.UnregisterCustomPropertyTypeLayout("BlackboardKeySelector");
@@ -86,7 +92,7 @@ void FBlackboardExtenderEditorModule::StartupModule()
 	// Register the details customizer
 	PropertyModule.RegisterCustomPropertyTypeLayout("BlackboardKeySelector",FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FBlackboardSelectorDetails::MakeInstance));
 	PropertyModule.RegisterCustomClassLayout("BTDecorator_Blackboard", FOnGetDetailCustomizationInstance::CreateStatic(&FBlackboardDecoratorDetails::MakeInstance));
-	PropertyModule.RegisterCustomClassLayout("BTDecorator", FOnGetDetailCustomizationInstance::CreateStatic( &FBehaviorDecoratorDetails::MakeInstance));
+	PropertyModule.RegisterCustomClassLayout("BTDecorator", FOnGetDetailCustomizationInstance::CreateStatic(&FBehaviorDecoratorDetails::MakeInstance));
 	PropertyModule.NotifyCustomizationModuleChanged();
 }
 
@@ -146,6 +152,12 @@ TSharedRef<IBEBehaviorTreeEditor> FBlackboardExtenderEditorModule::CreateBehavio
 	TSharedRef<FBehaviorTreeEditor> NewBehaviorTreeEditor(new FBehaviorTreeEditor());
 	NewBehaviorTreeEditor->InitBehaviorTreeEditor(Mode, InitToolkitHost, Object);
 	return NewBehaviorTreeEditor;
+}
+
+void FBlackboardExtenderEditorModule::CreateBlackboardConstantEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UObject* Object)
+{
+	TSharedRef<FBlackboardConstantEditor> NewBlackboardConstantEditor(new FBlackboardConstantEditor());
+	NewBlackboardConstantEditor->InitBlackboardConstantEditor(Mode, InitToolkitHost, Object);
 }
 
 #undef LOCTEXT_NAMESPACE

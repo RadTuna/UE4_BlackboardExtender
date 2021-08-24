@@ -5,7 +5,7 @@
 #include "EdGraph/EdGraph.h"
 #include "SoundClassGraph/SoundClassGraphSchema.h"
 #include "BehaviorTree/BTDecorator.h"
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 #include "BEBehaviorTreeDecoratorGraphNode.h"
 #include "AIGraphTypes.h"
 #include "BEBehaviorTreeDecoratorGraphNode_Decorator.h"

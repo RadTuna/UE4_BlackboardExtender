@@ -17,3 +17,9 @@ struct FBehaviorTreeEditorTabs
 	static const FName GraphEditorID;
 };
 
+struct FBlackboardConstantEditorTabs
+{
+	// Tab identifiers
+	static const FName DetailsID;
+};
+

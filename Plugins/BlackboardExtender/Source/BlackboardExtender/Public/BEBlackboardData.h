@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright RadTuna. All Rights Reserved.
 
 #pragma once
 
@@ -62,6 +62,7 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 
 private:
 	void UpdateParentElements();
+	void UpdateConstantElements();
 	void PropagateChangeElements();
 
 	void CleanUpCategoryMap();

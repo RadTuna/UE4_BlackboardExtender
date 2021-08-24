@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright RadTuna. All Rights Reserved.
 
 // Primary Include
 #include "AssetTypeActions_ExtendBehaviorTree.h"
@@ -10,7 +10,7 @@
 
 // User Include
 #include "BehaviorTreeEditor.h"
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 #include "SBehaviorTreeDiff.h"
 
 

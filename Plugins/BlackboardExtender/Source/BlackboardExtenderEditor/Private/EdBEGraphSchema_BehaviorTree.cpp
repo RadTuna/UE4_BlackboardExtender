@@ -4,7 +4,7 @@
 #include "Layout/SlateRect.h"
 #include "EdGraphNode_Comment.h"
 #include "Modules/ModuleManager.h"
-#include "BlackboardExtenderEditor.h"
+#include "BlackboardExtenderEditorModule.h"
 #include "BehaviorTree/BTDecorator.h"
 #include "BehaviorTree/BTService.h"
 #include "BehaviorTree/BTTaskNode.h"

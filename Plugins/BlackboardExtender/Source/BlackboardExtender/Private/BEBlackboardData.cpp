@@ -1,7 +1,10 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright RadTuna. All Rights Reserved.
 
 // Primary Include
 #include "BEBlackboardData.h"
+
+// User Include
+#include "BlackboardConstant.h"
 
 
 UBEBlackboardData::UBEBlackboardData(const FObjectInitializer& ObjectInitializer)
@@ -127,6 +130,20 @@ void UBEBlackboardData::UpdateParentElements()
 	}
 }
 
+void UBEBlackboardData::UpdateConstantElements()
+{
+	for (TObjectIterator<UBlackboardConstant> It; It; ++It)
+	{
+		if (It->BlackboardData == this)
+		{
+			TArray<FBlackboardEntry> AllEntry;
+			AllEntry.Append(ParentKeys);
+			AllEntry.Append(Keys);
+			It->UpdateConstantEntry(AllEntry);
+		}
+	}
+}
+
 void UBEBlackboardData::PropagateChangeElements()
 {
 	for (TObjectIterator<UBEBlackboardData> It; It; ++It)
@@ -134,6 +151,8 @@ void UBEBlackboardData::PropagateChangeElements()
 		if (It->Parent == this)
 		{
 			It->UpdateParentElements();
+			It->UpdateConstantElements();
+			
 			It->PropagateChangeElements();
 		}
 	}
