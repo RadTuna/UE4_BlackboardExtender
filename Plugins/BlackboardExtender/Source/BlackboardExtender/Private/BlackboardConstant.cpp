@@ -62,8 +62,10 @@ void UBlackboardConstant::PostEditChangeProperty(FPropertyChangedEvent& Property
 void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& AllEntry)
 {
 	TMap<FName, bool> ExistFlag;
+	ValidateConstantEntry();
 	for (const UBlackboardConstantEntry* Constant : ConstantEntry)
 	{
+		check(Constant != nullptr);
 		ExistFlag.Add(Constant->EntryName, false);
 	}
 	
@@ -109,48 +111,55 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 
 UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType)
 {
+	UBlackboardConstantEntry* OutEntry = nullptr;
 	if (InKeyType->IsA(UBlackboardKeyType_Bool::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Bool>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Bool>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Class::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Class>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Class>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Enum::StaticClass()) || InKeyType->IsA(UBlackboardKeyType_NativeEnum::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Enum>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Enum>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Float::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Float>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Float>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Int::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Int>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Int>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Name::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Name>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Name>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Object::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Object>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Object>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Rotator::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Rotator>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Rotator>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_String::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_String>();
+		OutEntry = NewObject<UBlackboardConstantEntry_String>(this);
 	}
 	else if (InKeyType->IsA(UBlackboardKeyType_Vector::StaticClass()))
 	{
-		return NewObject<UBlackboardConstantEntry_Vector>();
+		OutEntry = NewObject<UBlackboardConstantEntry_Vector>(this);
 	}
 
-	return nullptr;
+	if (OutEntry != nullptr)
+	{
+		OutEntry->EntryName = InEntryName;
+		OutEntry->BlackboardEntryType = InKeyType;
+	}
+
+	return OutEntry;
 }
 
 void UBlackboardConstant::GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry)
@@ -160,5 +169,23 @@ void UBlackboardConstant::GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry)
 		OutAllEntry.Empty();
 		OutAllEntry.Append(BlackboardData->ParentKeys);
 		OutAllEntry.Append(BlackboardData->Keys);
+	}
+}
+
+void UBlackboardConstant::ValidateConstantEntry()
+{
+	bool bIsValid = true;
+	for (const UBlackboardConstantEntry* Entry : ConstantEntry)
+	{
+		if (Entry == nullptr)
+		{
+			bIsValid = false;
+			break;
+		}
+	}
+
+	if (bIsValid == false)
+	{
+		ConstantEntry.Empty();
 	}
 }

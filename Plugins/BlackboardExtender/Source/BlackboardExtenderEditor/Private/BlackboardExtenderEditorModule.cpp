@@ -131,9 +131,9 @@ void FBlackboardExtenderEditorModule::ShutdownModule()
 	if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-		PropertyModule.UnregisterCustomPropertyTypeLayout( "BlackboardKeySelector" );
-		PropertyModule.UnregisterCustomClassLayout( "BTDecorator_Blackboard" );
-		PropertyModule.UnregisterCustomClassLayout( "BTDecorator" );
+		PropertyModule.UnregisterCustomPropertyTypeLayout("BlackboardKeySelector");
+		PropertyModule.UnregisterCustomClassLayout("BTDecorator_Blackboard");
+		PropertyModule.UnregisterCustomClassLayout("BTDecorator");
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
 }

@@ -6,30 +6,30 @@
 #include "BlackboardConstantEntry.h"
 #include "BlackboardConstantEntry_Rotator.generated.h"
 
-USTRUCT()
-struct FBlackboardConstantEntry_Rotator : public FBlackboardConstantEntry
+UCLASS()
+class BLACKBOARDEXTENDER_API UBlackboardConstantEntry_Rotator : public UBlackboardConstantEntry
 {
 	GENERATED_BODY()
 
 public:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	FRotator Data;
 
 public:
-	FBlackboardConstantEntry_Rotator()
-		: FBlackboardConstantEntry()
+	UBlackboardConstantEntry_Rotator()
+		: UBlackboardConstantEntry()
 		, Data(FRotator::ZeroRotator)
 	{
 	}
 	
-	FBlackboardConstantEntry_Rotator(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: FBlackboardConstantEntry(InEntryName, InKeyType)
+	UBlackboardConstantEntry_Rotator(const FName& InEntryName, UBlackboardKeyType* InKeyType)
+		: UBlackboardConstantEntry(InEntryName, InKeyType)
 		, Data(FRotator::ZeroRotator)
 	{
 	}
 	
-	virtual ~FBlackboardConstantEntry_Rotator() override {}
+	virtual ~UBlackboardConstantEntry_Rotator() override {}
 	
 	virtual void ClearData() override { Data = FRotator::ZeroRotator; }
 };

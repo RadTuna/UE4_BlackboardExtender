@@ -6,30 +6,30 @@
 #include "BlackboardConstantEntry.h"
 #include "BlackboardConstantEntry_Name.generated.h"
 
-USTRUCT()
-struct FBlackboardConstantEntry_Name : public FBlackboardConstantEntry
+UCLASS()
+class BLACKBOARDEXTENDER_API UBlackboardConstantEntry_Name : public UBlackboardConstantEntry
 {
 	GENERATED_BODY()
 
 public:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	FName Data;
 
 public:
-	FBlackboardConstantEntry_Name()
-		: FBlackboardConstantEntry()
+	UBlackboardConstantEntry_Name()
+		: UBlackboardConstantEntry()
 		, Data(NAME_None)
 	{
 	}
 	
-	FBlackboardConstantEntry_Name(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: FBlackboardConstantEntry(InEntryName, InKeyType)
+	UBlackboardConstantEntry_Name(const FName& InEntryName, UBlackboardKeyType* InKeyType)
+		: UBlackboardConstantEntry(InEntryName, InKeyType)
 		, Data(NAME_None)
 	{
 	}
 	
-	virtual ~FBlackboardConstantEntry_Name() override {}
+	virtual ~UBlackboardConstantEntry_Name() override {}
 	
 	virtual void ClearData() override { Data = NAME_None; }
 };

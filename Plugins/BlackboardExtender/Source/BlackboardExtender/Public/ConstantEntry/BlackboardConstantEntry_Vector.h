@@ -6,30 +6,30 @@
 #include "BlackboardConstantEntry.h"
 #include "BlackboardConstantEntry_Vector.generated.h"
 
-USTRUCT()
-struct FBlackboardConstantEntry_Vector : public FBlackboardConstantEntry
+UCLASS()
+class BLACKBOARDEXTENDER_API UBlackboardConstantEntry_Vector : public UBlackboardConstantEntry
 {
 	GENERATED_BODY()
 
 public:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	FVector Data;
 
 public:
-	FBlackboardConstantEntry_Vector()
-		: FBlackboardConstantEntry()
+	UBlackboardConstantEntry_Vector()
+		: UBlackboardConstantEntry()
 		, Data(FVector::ZeroVector)
 	{
 	}
 	
-	FBlackboardConstantEntry_Vector(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: FBlackboardConstantEntry(InEntryName, InKeyType)
+	UBlackboardConstantEntry_Vector(const FName& InEntryName, UBlackboardKeyType* InKeyType)
+		: UBlackboardConstantEntry(InEntryName, InKeyType)
 		, Data(FVector::ZeroVector)
 	{
 	}
 	
-	virtual ~FBlackboardConstantEntry_Vector() override {}
+	virtual ~UBlackboardConstantEntry_Vector() override {}
 	
 	virtual void ClearData() override { Data = FVector::ZeroVector; }
 };

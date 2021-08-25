@@ -134,6 +134,7 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 
 			TSharedPtr<IPropertyHandle> bInstanceSyncedProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, bInstanceSynced));
 			DetailCategoryBuilder.AddProperty(bInstanceSyncedProperty);
+			
 		}	
 	}
 }

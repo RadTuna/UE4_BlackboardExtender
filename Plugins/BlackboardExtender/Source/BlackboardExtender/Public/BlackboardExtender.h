@@ -7,7 +7,7 @@
 class FToolBarBuilder;
 class FMenuBuilder;
 
-class FBlackboardExtenderModule : public IModuleInterface
+class BLACKBOARDEXTENDER_API FBlackboardExtenderModule : public IModuleInterface
 {
 public:
 	/** IModuleInterface implementation */

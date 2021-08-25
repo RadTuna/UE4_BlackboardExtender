@@ -12,7 +12,7 @@
 
 class UBEBlackboardData;
 
-UCLASS()
+UCLASS(BlueprintType)
 class BLACKBOARDEXTENDER_API UBlackboardConstant : public UDataAsset
 {
 	GENERATED_BODY()
@@ -21,8 +21,8 @@ public:
 	UPROPERTY(EditAnywhere, Category=Blackboard)
 	UBEBlackboardData* BlackboardData;
 
-	UPROPERTY(VisibleAnywhere, Category=BlackboardConstant)
-	TArray<UBlackboardConstantEntry> ConstantEntry;
+	UPROPERTY(EditAnywhere, Category=BlackboardConstant)
+	TArray<UBlackboardConstantEntry*> ConstantEntry;
 
 public:
 	virtual void PostInitProperties() override;
@@ -35,5 +35,6 @@ public:
 	void UpdateConstantEntry(const TArray<FBlackboardEntry>& AllEntry);
 	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType);
 	void GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry);
+	void ValidateConstantEntry();
 	
 };
