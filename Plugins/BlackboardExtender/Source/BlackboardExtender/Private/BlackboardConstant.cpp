@@ -40,11 +40,11 @@ void UBlackboardConstant::PostLoad()
 #if WITH_EDITOR
 void UBlackboardConstant::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
 	TArray<FBlackboardEntry> AllEntry;
 	GatherAllEntry(AllEntry);
 	UpdateConstantEntry(AllEntry);
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
 
@@ -97,6 +97,8 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 			});
 		}
 	}
+
+	
 }
 
 UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType)

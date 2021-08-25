@@ -6,7 +6,7 @@
 #include "BlackboardConstant.h"
 
 
-class FBlackboardConstantEditor : public FAssetEditorToolkit
+class FBlackboardConstantEditor : public FAssetEditorToolkit, public FNotifyHook
 {
 public:
 	FBlackboardConstantEditor();
@@ -17,13 +17,16 @@ public:
 	
 	void InitBlackboardConstantEditor( const EToolkitMode::Type Mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, UObject* InObject );
 	
-	//~ Begin IToolkit Interface
+	// IToolkit Interface
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
 	virtual FText GetToolkitName() const override;
 	virtual FText GetToolkitToolTipText() const override;
+
+	// FNotifyHook Interface
+	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
 
 	TSharedPtr<IDetailsView> SpawnDetailsView();
 	TSharedRef<FTabManager::FLayout> MakeEditorLayout();

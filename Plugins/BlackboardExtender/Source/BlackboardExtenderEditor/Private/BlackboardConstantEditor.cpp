@@ -93,6 +93,13 @@ FText FBlackboardConstantEditor::GetToolkitToolTipText() const
 	return FAssetEditorToolkit::GetToolkitToolTipText();
 }
 
+void FBlackboardConstantEditor::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
+{
+	FNotifyHook::NotifyPostChange(PropertyChangedEvent, PropertyThatChanged);
+
+	DetailsView->SetObject(BlackboardConstant, true);
+}
+
 TSharedPtr<IDetailsView> FBlackboardConstantEditor::SpawnDetailsView()
 {
 	const bool bIsUpdatable = false;
@@ -102,6 +109,7 @@ TSharedPtr<IDetailsView> FBlackboardConstantEditor::SpawnDetailsView()
 
 	FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	FDetailsViewArgs DetailsViewArgs(bIsUpdatable, bIsLockable, bAllowSearch, FDetailsViewArgs::HideNameArea, bHideSelectionTip);
+	DetailsViewArgs.NotifyHook = this;
 	TSharedPtr<IDetailsView> NewDetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 
 	FOnGetDetailCustomizationInstance LayoutDetails = FOnGetDetailCustomizationInstance::CreateStatic(FBlackboardConstantDetails::MakeInstance);
