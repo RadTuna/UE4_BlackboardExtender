@@ -134,6 +134,28 @@ void FBlackboardDataDetails::CustomizeDetails( IDetailLayoutBuilder& DetailLayou
 
 			TSharedPtr<IPropertyHandle> bInstanceSyncedProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, bInstanceSynced));
 			DetailCategoryBuilder.AddProperty(bInstanceSyncedProperty);
+
+			const FText ConstantRowName = LOCTEXT("EntryConstant", "Is Constant");
+			DetailCategoryBuilder.AddCustomRow(ConstantRowName)
+			.NameContent()
+			[
+				SNew(STextBlock)
+				.SimpleTextMode(true)
+				.Font(FontStyle)
+				.Text(ConstantRowName)
+			]
+			.ValueContent()
+			[
+				SNew(SHorizontalBox)
+				.IsEnabled(!bIsInherited)
+				+SHorizontalBox::Slot()
+				.FillWidth(1.0f)
+				[
+					SNew(SCheckBox)
+					.IsChecked(this, &FBlackboardDataDetails::HandleOnIsConstantChecked)
+					.OnCheckStateChanged(this, &FBlackboardDataDetails::HandleOnConstantCheckStateChanged)
+				]
+			];
 			
 		}	
 	}
@@ -200,7 +222,7 @@ bool FBlackboardDataDetails::HandleOnVerifyEntryNameChanged(const FText& InNewTe
 	}
 
 	TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
-	FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+	const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
 
 	UBlackboardData* BlackboardData = BlackboardDataCached.Get();
@@ -263,5 +285,56 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 		BlackboardView->RefreshGraphActionMenuItems();
 	}
 }
+
+ECheckBoxState FBlackboardDataDetails::HandleOnIsConstantChecked() const
+{
+	ECheckBoxState OutState = ECheckBoxState::Undetermined;
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached);
+	if (BEBlackboardData != nullptr && CurrentCategorySelection >= 0)
+	{
+		TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
+		const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+		const FBlackboardEntryIdentifier Identifier(CurrentEntry);
+
+		const bool* Result = BEBlackboardData->ConstantMap.Find(Identifier);
+		if (Result != nullptr)
+		{
+			OutState = *Result ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+		}
+	}
+
+	return OutState;
+}
+
+void FBlackboardDataDetails::HandleOnConstantCheckStateChanged(ECheckBoxState InCheckState)
+{
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached);
+	if (BEBlackboardData != nullptr && CurrentCategorySelection >= 0)
+	{
+		TArray<FBlackboardEntry>& CurrentEntryArray = bIsInheritedSelection ? BlackboardDataCached->ParentKeys : BlackboardDataCached->Keys;
+		const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
+		const FBlackboardEntryIdentifier Identifier(CurrentEntry);
+
+		if (BEBlackboardData->ConstantMap.Contains(Identifier))
+		{
+			bool CheckData = false;
+			switch (InCheckState)
+			{
+				case ECheckBoxState::Checked:
+					CheckData = true;
+					break;
+				case ECheckBoxState::Unchecked:
+					CheckData = false;
+					break;
+				default:
+					check(false);
+					break;
+			}
+			
+			BEBlackboardData->ConstantMap.Add(Identifier, CheckData);
+		}
+	}
+}
+
 
 #undef LOCTEXT_NAMESPACE

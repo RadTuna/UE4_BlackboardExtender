@@ -33,6 +33,8 @@ private:
 	void HandleOnCommittedEntryName(const FText& InName, ETextCommit::Type CommitType);
 	bool HandleOnVerifyEntryNameChanged(const FText& InNewText, FText& OutErrorMessage);
 	void HandleOnCommittedCategory(const FText& InCategory, ETextCommit::Type CommitType);
+	ECheckBoxState HandleOnIsConstantChecked() const;
+	void HandleOnConstantCheckStateChanged(ECheckBoxState InCheckState);
 
 private:
 	/** Delegate used to retrieve current blackboard selection */

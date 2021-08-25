@@ -83,5 +83,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
 	TArray<FBlackboardEntryIdentifier> KeysOrder;
+
+	UPROPERTY(VisibleAnywhere, Category=BlackboardCategory)
+	TMap<FBlackboardEntryIdentifier, bool> ConstantMap;
 #endif
 };

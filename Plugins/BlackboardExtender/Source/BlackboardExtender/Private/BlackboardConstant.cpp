@@ -5,17 +5,6 @@
 
 // Engine Include
 #include "BEBlackboardData.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Class.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Enum.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Int.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Name.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_NativeEnum.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Rotator.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_String.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 
 // User Include
 #include "ConstantEntry/BlackboardConstantEntry_Bool.h"
@@ -113,7 +102,7 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType)
 {
 	UBlackboardConstantEntry* OutEntry = nullptr;
-	EBlackboardKeyType KeyType = ConvertToEnumBlackboardKeyType(InKeyType);
+	const EBlackboardKeyType KeyType = ConvertToEnumBlackboardKeyType(InKeyType);
 	switch (KeyType)
 	{
 		case EBlackboardKeyType::Bool:
@@ -145,6 +134,9 @@ UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const
 			break;
 		case EBlackboardKeyType::Vector:
 			OutEntry = NewObject<UBlackboardConstantEntry_Vector>(this);
+			break;
+		default:
+			check(false);
 			break;
 	}
 
