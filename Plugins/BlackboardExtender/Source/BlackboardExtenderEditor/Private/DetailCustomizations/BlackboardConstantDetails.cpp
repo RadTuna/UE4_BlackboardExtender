@@ -32,55 +32,20 @@ void FBlackboardConstantDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBu
 			BlackboardConstantCached = BlackboardConstant;
 		}
 	}
-
-#if 0
-	UBlackboardConstant* BlackboardConstant = BlackboardConstantCached.Get();
 	
-	FSlateFontInfo FontStyle = FEditorStyle::GetFontStyle(TEXT("PropertyWindow.NormalFont"));
-	IDetailCategoryBuilder& CategoryBuilder = DetailBuilder.EditCategory(TEXT("Constant"));
-
-	TSharedPtr<IPropertyHandle> ConstantHandle = DetailBuilder.GetProperty(TEXT("ConstantEntry"));
-	for (int32 Index = 0; Index < BlackboardConstant->ConstantEntry.Num(); ++Index)
-	{
-		const UBlackboardConstantEntry* Entry = BlackboardConstant->ConstantEntry[Index];
-		TSharedPtr<IPropertyHandle> EntryHandle = ConstantHandle->GetChildHandle(static_cast<uint32>(Index));
-		TSharedPtr<IPropertyHandle> DataHandle = EntryHandle->GetChildHandle(TEXT("Data"));
-
-		FProperty* Test;
-		Test->
-		
-		const FText RowName = FText::FromName(Entry->EntryName);
-		CategoryBuilder.AddCustomRow(RowName)
-		.NameContent()
-		[
-			SNew(STextBlock)
-			.SimpleTextMode(true)
-			.Font(FontStyle)
-			.Text(RowName)
-		]
-		.ValueContent()
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot()
-			[
-				DataHandle->CreatePropertyValueWidget()
-			]
-		];
-	}
-#else
-	FSlateFontInfo FontStyle = FEditorStyle::GetFontStyle(TEXT("PropertyWindow.NormalFont"));
 	UBlackboardConstant* BlackboardConstant = BlackboardConstantCached.Get();
-	IDetailCategoryBuilder& CategoryBuilder = DetailBuilder.EditCategory(TEXT("Constant"));
-
-	for (UBlackboardConstantEntry* Entry : BlackboardConstant->ConstantEntry)
+	if (BlackboardConstant != nullptr)
 	{
-		TArray<UObject*> PropertyEntry;
-		PropertyEntry.Add(Entry);
-		IDetailPropertyRow* PropertyRow = CategoryBuilder.AddExternalObjectProperty(PropertyEntry, TEXT("Data"));
-		TSharedPtr<IPropertyHandle> PropertyHandle = PropertyRow->GetPropertyHandle();
-		PropertyHandle->SetPropertyDisplayName(FText::FromName(Entry->EntryName));
+		IDetailCategoryBuilder& CategoryBuilder = DetailBuilder.EditCategory(TEXT("Constant"));
+
+		for (UBlackboardConstantEntry* Entry : BlackboardConstant->ConstantEntry)
+		{
+			TArray<UObject*> PropertyEntry;
+			PropertyEntry.Add(Entry);
+			IDetailPropertyRow* PropertyRow = CategoryBuilder.AddExternalObjectProperty(PropertyEntry, TEXT("Data"));
+			TSharedPtr<IPropertyHandle> PropertyHandle = PropertyRow->GetPropertyHandle();
+			PropertyHandle->SetPropertyDisplayName(FText::FromName(Entry->EntryName));
+		}
 	}
-	
-#endif
 }
 

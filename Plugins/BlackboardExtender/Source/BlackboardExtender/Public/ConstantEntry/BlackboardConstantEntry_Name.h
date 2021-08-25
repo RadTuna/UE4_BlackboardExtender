@@ -23,12 +23,6 @@ public:
 	{
 	}
 	
-	UBlackboardConstantEntry_Name(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: UBlackboardConstantEntry(InEntryName, InKeyType)
-		, Data(NAME_None)
-	{
-	}
-	
 	virtual ~UBlackboardConstantEntry_Name() override {}
 	
 	virtual void ClearData() override { Data = NAME_None; }

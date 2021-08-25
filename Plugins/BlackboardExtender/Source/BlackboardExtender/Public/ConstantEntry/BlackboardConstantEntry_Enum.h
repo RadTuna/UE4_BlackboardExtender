@@ -23,12 +23,6 @@ public:
 	{
 	}
 	
-	UBlackboardConstantEntry_Enum(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: UBlackboardConstantEntry(InEntryName, InKeyType)
-		, Data(0)
-	{
-	}
-	
 	virtual ~UBlackboardConstantEntry_Enum() override {}
 	
 	virtual void ClearData() override { Data = 0; }

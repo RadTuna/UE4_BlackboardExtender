@@ -23,12 +23,6 @@ public:
 	{
 	}
 	
-	UBlackboardConstantEntry_Float(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: UBlackboardConstantEntry(InEntryName, InKeyType)
-		, Data(0.f)
-	{
-	}
-	
 	virtual ~UBlackboardConstantEntry_Float() override {}
 	
 	virtual void ClearData() override { Data = 0.f; }

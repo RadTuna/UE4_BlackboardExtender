@@ -89,9 +89,10 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 			ExistFlag.Add(Entry.EntryName, true);
 			
 			// Changed entry type
-			if ((*FoundEntry)->BlackboardEntryType != Entry.KeyType)
+			EBlackboardKeyType KeyType = ConvertToEnumBlackboardKeyType(Entry.KeyType);
+			if ((*FoundEntry)->BlackboardEntryType != KeyType)
 			{
-				(*FoundEntry)->BlackboardEntryType = Entry.KeyType;
+				(*FoundEntry)->BlackboardEntryType = KeyType;
 				(*FoundEntry)->ClearData();
 			}
 		}
@@ -112,51 +113,45 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType)
 {
 	UBlackboardConstantEntry* OutEntry = nullptr;
-	if (InKeyType->IsA(UBlackboardKeyType_Bool::StaticClass()))
+	EBlackboardKeyType KeyType = ConvertToEnumBlackboardKeyType(InKeyType);
+	switch (KeyType)
 	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Bool>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Class::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Class>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Enum::StaticClass()) || InKeyType->IsA(UBlackboardKeyType_NativeEnum::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Enum>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Float::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Float>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Int::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Int>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Name::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Name>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Object::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Object>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Rotator::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Rotator>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_String::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_String>(this);
-	}
-	else if (InKeyType->IsA(UBlackboardKeyType_Vector::StaticClass()))
-	{
-		OutEntry = NewObject<UBlackboardConstantEntry_Vector>(this);
+		case EBlackboardKeyType::Bool:
+			OutEntry = NewObject<UBlackboardConstantEntry_Bool>(this);
+			break;
+		case EBlackboardKeyType::Class:
+			OutEntry = NewObject<UBlackboardConstantEntry_Class>(this);
+			break;
+		case EBlackboardKeyType::Enum:
+			OutEntry = NewObject<UBlackboardConstantEntry_Enum>(this);
+			break;
+		case EBlackboardKeyType::Float:
+			OutEntry = NewObject<UBlackboardConstantEntry_Float>(this);
+			break;
+		case EBlackboardKeyType::Int:
+			OutEntry = NewObject<UBlackboardConstantEntry_Int>(this);
+			break;
+		case EBlackboardKeyType::Name:
+			OutEntry = NewObject<UBlackboardConstantEntry_Name>(this);
+			break;
+		case EBlackboardKeyType::Object:
+			OutEntry = NewObject<UBlackboardConstantEntry_Object>(this);
+			break;
+		case EBlackboardKeyType::Rotator:
+			OutEntry = NewObject<UBlackboardConstantEntry_Rotator>(this);
+			break;
+		case EBlackboardKeyType::String:
+			OutEntry = NewObject<UBlackboardConstantEntry_String>(this);
+			break;
+		case EBlackboardKeyType::Vector:
+			OutEntry = NewObject<UBlackboardConstantEntry_Vector>(this);
+			break;
 	}
 
 	if (OutEntry != nullptr)
 	{
 		OutEntry->EntryName = InEntryName;
-		OutEntry->BlackboardEntryType = InKeyType;
+		OutEntry->BlackboardEntryType = KeyType;
 	}
 
 	return OutEntry;
@@ -167,6 +162,7 @@ void UBlackboardConstant::GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry)
 	if (BlackboardData != nullptr)
 	{
 		OutAllEntry.Empty();
+		BlackboardData->UpdateParentKeys();
 		OutAllEntry.Append(BlackboardData->ParentKeys);
 		OutAllEntry.Append(BlackboardData->Keys);
 	}

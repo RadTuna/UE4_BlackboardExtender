@@ -23,12 +23,6 @@ public:
 	{
 	}
 	
-	UBlackboardConstantEntry_Bool(const FName& InEntryName, UBlackboardKeyType* InKeyType)
-		: UBlackboardConstantEntry(InEntryName, InKeyType)
-		, Data(false)
-	{
-	}
-	
 	virtual ~UBlackboardConstantEntry_Bool() override {}
 	
 	virtual void ClearData() override { Data = false; }
