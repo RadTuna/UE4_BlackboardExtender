@@ -36,7 +36,7 @@ void UBEBehaviorTreeGraphNode_Root::AllocateDefaultPins()
 
 FText UBEBehaviorTreeGraphNode_Root::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return NSLOCTEXT("BehaviorTreeEditor", "Root", "ROOT");
+	return NSLOCTEXT("BlackboardExtenderEditor", "Root", "ROOT");
 }
 
 FName UBEBehaviorTreeGraphNode_Root::GetNameIcon() const

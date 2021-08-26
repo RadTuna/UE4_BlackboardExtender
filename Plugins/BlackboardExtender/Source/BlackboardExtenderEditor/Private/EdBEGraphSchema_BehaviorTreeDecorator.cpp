@@ -137,7 +137,7 @@ void UEdBEGraphSchema_BehaviorTreeDecorator::GetGraphContextActions(FGraphContex
 	const UBEBehaviorTreeDecoratorGraphNode* ParentGraphNode = ContextMenuBuilder.FromPin 
 		? Cast<UBEBehaviorTreeDecoratorGraphNode>(ContextMenuBuilder.FromPin->GetOuter()) : NULL;
 
-	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BehaviorTreeEditor"));
+	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BlackboardExtenderEditor"));
 	FGraphNodeClassHelper* ClassCache = EditorModule.GetClassCache().Get();
 
 	TArray<FGraphNodeClassData> NodeClasses;

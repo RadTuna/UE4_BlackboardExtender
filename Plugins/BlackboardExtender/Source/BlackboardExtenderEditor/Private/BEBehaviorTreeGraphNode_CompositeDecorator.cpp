@@ -10,7 +10,7 @@
 #include "EdBEGraphSchema_BehaviorTreeDecorator.h"
 #include "BehaviorTree/BehaviorTree.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 UBEBehaviorTreeGraphNode_CompositeDecorator::UBEBehaviorTreeGraphNode_CompositeDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

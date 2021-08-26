@@ -33,7 +33,7 @@
 #include "BEBehaviorTreeGraphNode_SimpleParallel.h"
 #include "BEBehaviorTreeGraphNode_SubtreeTask.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 int32 UEdBEGraphSchema_BehaviorTree::CurrentCacheRefreshID = 0;
 
@@ -84,7 +84,7 @@ void UEdBEGraphSchema_BehaviorTree::GetGraphNodeContextActions(FGraphContextMenu
 
 void UEdBEGraphSchema_BehaviorTree::GetSubNodeClasses(int32 SubNodeFlags, TArray<FGraphNodeClassData>& ClassData, UClass*& GraphNodeClass) const
 {
-	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BehaviorTreeEditor"));
+	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BlackboardExtenderEditor"));
 	FGraphNodeClassHelper* ClassCache = EditorModule.GetClassCache().Get();
 
 	if (SubNodeFlags == ESubNode::Decorator)
@@ -111,7 +111,7 @@ void UEdBEGraphSchema_BehaviorTree::GetGraphContextActions(FGraphContextMenuBuil
 	const bool bAllowComposites = bNoParent || !bOnlyTasks || bOnlyComposites;
 	const bool bAllowTasks = bNoParent || !bOnlyComposites || bOnlyTasks;
 
-	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BehaviorTreeEditor"));
+	FBlackboardExtenderEditorModule& EditorModule = FModuleManager::GetModuleChecked<FBlackboardExtenderEditorModule>(TEXT("BlackboardExtenderEditor"));
 	FGraphNodeClassHelper* ClassCache = EditorModule.GetClassCache().Get();
 
 	if (bAllowComposites)

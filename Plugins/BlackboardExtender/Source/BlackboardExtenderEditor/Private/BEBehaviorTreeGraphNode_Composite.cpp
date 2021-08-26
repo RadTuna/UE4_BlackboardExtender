@@ -26,7 +26,7 @@ FText UBEBehaviorTreeGraphNode_Composite::GetDescription() const
 	{
 		return FText::Format(FText::FromString(TEXT("{0}\n{1}")),
 			Super::GetDescription(),
-			NSLOCTEXT("BehaviorTreeEditor", "CompositeNodeScopeDesc", "Local scope for observers"));
+			NSLOCTEXT("BlackboardExtenderEditor", "CompositeNodeScopeDesc", "Local scope for observers"));
 	}
 
 	return Super::GetDescription();
@@ -39,7 +39,7 @@ FText UBEBehaviorTreeGraphNode_Composite::GetTooltipText() const
 	{
 		return FText::Format(FText::FromString(TEXT("{0}\n\n{1}")), 
 			Super::GetDescription(), 
-			NSLOCTEXT("BehaviorTreeEditor", "CompositeNodeScopeTooltip", "This node is a local scope for decorators.\nAll observing decorators (Lower Priority or Both) will be removed when execution flow leaves this branch."));
+			NSLOCTEXT("BlackboardExtenderEditor", "CompositeNodeScopeTooltip", "This node is a local scope for decorators.\nAll observing decorators (Lower Priority or Both) will be removed when execution flow leaves this branch."));
 	}
 
 	return Super::GetTooltipText();

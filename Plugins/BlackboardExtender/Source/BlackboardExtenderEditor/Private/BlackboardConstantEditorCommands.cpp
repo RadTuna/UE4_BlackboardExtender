@@ -3,11 +3,14 @@
 // Primary Include
 #include "BlackboardConstantEditorCommands.h"
 
+// User Include
+#include "BlackboardConstantEditor.h"
+
 
 #define LOCTEXT_NAMESPACE "BlackboardConstantEditorCommands"
 
 FBlackboardConstantEditorCommands::FBlackboardConstantEditorCommands()
-	: TCommands<FBlackboardConstantEditorCommands>(TEXT("BlackboardConstantEditor"), LOCTEXT("ConstantEditor", "ConstantEditor"), NAME_None, FEditorStyle::GetStyleSetName())
+	: TCommands<FBlackboardConstantEditorCommands>(TEXT("BlackboardConstant"), LOCTEXT("ConstantEditor", "ConstantEditor"), NAME_None, FBlackboardConstantStyle::GetStyleName())
 {
 }
 

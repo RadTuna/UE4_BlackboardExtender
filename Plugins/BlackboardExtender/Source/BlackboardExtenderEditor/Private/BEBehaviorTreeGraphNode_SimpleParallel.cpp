@@ -3,7 +3,7 @@
 #include "BEBehaviorTreeGraphNode_SimpleParallel.h"
 #include "BEBehaviorTreeEditorTypes.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 UBEBehaviorTreeGraphNode_SimpleParallel::UBEBehaviorTreeGraphNode_SimpleParallel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

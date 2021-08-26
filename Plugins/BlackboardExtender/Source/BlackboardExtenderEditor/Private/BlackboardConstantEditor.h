@@ -6,6 +6,20 @@
 #include "BlackboardConstant.h"
 
 
+class FBlackboardConstantStyle
+{
+public:
+	static void Initialize();
+	static void Release();
+
+	static FName GetStyleName();
+	static ISlateStyle& Get();
+
+private:
+	static TSharedPtr<class FSlateStyleSet> Instance;
+	
+};
+
 class FBlackboardConstantEditor : public FAssetEditorToolkit, public FNotifyHook
 {
 public:

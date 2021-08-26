@@ -62,7 +62,7 @@
 #include "Widgets/Docking/SDockTab.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 const FName FBehaviorTreeEditor::BehaviorTreeMode(TEXT("BehaviorTree"));
 const FName FBehaviorTreeEditor::BlackboardMode(TEXT("Blackboard"));
@@ -229,7 +229,7 @@ void FBehaviorTreeEditor::InitBehaviorTreeEditor( const EToolkitMode::Type Mode,
 		Debugger->OnDebuggedBlackboardChanged().AddSP(this, &FBehaviorTreeEditor::HandleDebuggedBlackboardChanged);
 		BindDebuggerToolbarCommands();
 
-		FBlackboardExtenderEditorModule& BehaviorTreeEditorModule = FModuleManager::LoadModuleChecked<FBlackboardExtenderEditorModule>( "BehaviorTreeEditor" );
+		FBlackboardExtenderEditorModule& BehaviorTreeEditorModule = FModuleManager::LoadModuleChecked<FBlackboardExtenderEditorModule>( "BlackboardExtenderEditor" );
 		AddMenuExtender(BehaviorTreeEditorModule.GetMenuExtensibilityManager()->GetAllExtenders(GetToolkitCommands(), GetEditingObjects()));
 
 		AddApplicationMode(BehaviorTreeMode, MakeShareable(new FBehaviorTreeEditorApplicationMode(SharedThis(this))));

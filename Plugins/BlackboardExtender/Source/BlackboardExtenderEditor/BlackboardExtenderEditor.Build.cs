@@ -19,7 +19,7 @@ public class BlackboardExtenderEditor : ModuleRules
 				"AssetRegistry",
 				"AssetTools",
                 "PropertyEditor",
-				"ContentBrowser"
+				"ContentBrowser",
 			}
 		);
 
@@ -28,11 +28,11 @@ public class BlackboardExtenderEditor : ModuleRules
 				"Core", 
 				"CoreUObject", 
 				"ApplicationCore",
-				"Engine", 
-                "RenderCore",
-                "InputCore",
+				"Engine",
 				"Slate",
 				"SlateCore",
+                "RenderCore",
+                "InputCore",
                 "EditorStyle",
 				"UnrealEd", 
                 "AudioEditor",

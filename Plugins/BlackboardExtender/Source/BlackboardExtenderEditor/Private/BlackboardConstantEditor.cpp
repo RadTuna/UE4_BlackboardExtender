@@ -3,6 +3,10 @@
 // Primary Include
 #include "BlackboardConstantEditor.h"
 
+// Engine Include
+#include "Styling/SlateStyle.h"
+#include "Styling/SlateStyleRegistry.h"
+
 // User Include
 #include "BehaviorTreeEditorTabs.h"
 #include "BlackboardConstant.h"
@@ -12,7 +16,41 @@
 
 #define LOCTEXT_NAMESPACE "BlackboardConstantEditor"
 
+TSharedPtr<FSlateStyleSet> FBlackboardConstantStyle::Instance = nullptr;
 const FName FBlackboardConstantEditor::BlackboardConstantEditorID(TEXT("BlackboardConstantEditor"));
+
+#define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( Instance->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+void FBlackboardConstantStyle::Initialize()
+{
+	if (Instance.IsValid() == false)
+	{
+		Instance = MakeShareable(new FSlateStyleSet(GetStyleName()));
+		Instance->SetContentRoot(FPaths::EngineContentDir() / TEXT("Editor/Slate/Icons"));
+
+		const FVector2D Icon40x40(40.f, 40.f);
+		Instance->Set("BlackboardConstant.RefreshConstantEditor", new IMAGE_BRUSH("icon_Matinee_PlayLoopSection_40x", Icon40x40));
+
+		FSlateStyleRegistry::RegisterSlateStyle(Get());
+	}
+}
+#undef IMAGE_BRUSH
+
+void FBlackboardConstantStyle::Release()
+{
+	FSlateStyleRegistry::UnRegisterSlateStyle(Get());
+	Instance.Reset();
+}
+
+FName FBlackboardConstantStyle::GetStyleName()
+{
+	static FName StyleName(TEXT("BlackboardConstantStyle"));
+	return StyleName;
+}
+
+ISlateStyle& FBlackboardConstantStyle::Get()
+{
+	return *Instance;
+}
 
 FBlackboardConstantEditor::FBlackboardConstantEditor()
 	: FAssetEditorToolkit()

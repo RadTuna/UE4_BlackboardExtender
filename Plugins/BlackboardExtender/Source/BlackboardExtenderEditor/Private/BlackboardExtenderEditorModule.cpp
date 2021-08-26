@@ -55,6 +55,8 @@ TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_BehaviorTree;
 
 void FBlackboardExtenderEditorModule::StartupModule()
 {
+	FBlackboardConstantStyle::Initialize();
+	
 	MenuExtensibilityManager = MakeShareable(new FExtensibilityManager);
 	ToolBarExtensibilityManager = MakeShareable(new FExtensibilityManager);
 	
@@ -102,6 +104,8 @@ void FBlackboardExtenderEditorModule::ShutdownModule()
 	{
 		return;
 	}
+
+	FBlackboardConstantStyle::Release();
 
 	MenuExtensibilityManager.Reset();
 	ToolBarExtensibilityManager.Reset();

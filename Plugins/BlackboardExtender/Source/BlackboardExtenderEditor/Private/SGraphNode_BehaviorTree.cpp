@@ -31,7 +31,7 @@
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "SLevelOfDetailBranchNode.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 namespace
 {

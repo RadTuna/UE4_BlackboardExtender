@@ -5,6 +5,7 @@
 
 // Engine Include
 #include "BEBlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 // User Include
 #include "ConstantEntry/BlackboardConstantEntry_Bool.h"
@@ -41,6 +42,85 @@ void UBlackboardConstant::PostEditChangeProperty(FPropertyChangedEvent& Property
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
+
+void UBlackboardConstant::InitBlackboardComponent(UBlackboardComponent* BlackboardComponent)
+{
+	if (BlackboardComponent == nullptr)
+	{
+		return;
+	}
+
+	for (UBlackboardConstantEntry* Entry : ConstantEntry)
+	{
+		check(Entry != nullptr);
+		switch (Entry->BlackboardEntryType)
+		{
+			case EBlackboardKeyType::Bool:
+				{
+					const UBlackboardConstantEntry_Bool* CurrentEntry = Cast<UBlackboardConstantEntry_Bool>(Entry);
+					BlackboardComponent->SetValueAsBool(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Class:
+				{
+					const UBlackboardConstantEntry_Class* CurrentEntry = Cast<UBlackboardConstantEntry_Class>(Entry);
+					BlackboardComponent->SetValueAsClass(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Enum:
+				{
+					const UBlackboardConstantEntry_Enum* CurrentEntry = Cast<UBlackboardConstantEntry_Enum>(Entry);
+					BlackboardComponent->SetValueAsEnum(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Float:
+				{
+					const UBlackboardConstantEntry_Float* CurrentEntry = Cast<UBlackboardConstantEntry_Float>(Entry);
+					BlackboardComponent->SetValueAsFloat(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Int:
+				{
+					const UBlackboardConstantEntry_Int* CurrentEntry = Cast<UBlackboardConstantEntry_Int>(Entry);
+					BlackboardComponent->SetValueAsInt(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Name:
+				{
+					const UBlackboardConstantEntry_Name* CurrentEntry = Cast<UBlackboardConstantEntry_Name>(Entry);
+					BlackboardComponent->SetValueAsName(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Object:
+				{
+					const UBlackboardConstantEntry_Object* CurrentEntry = Cast<UBlackboardConstantEntry_Object>(Entry);
+					BlackboardComponent->SetValueAsObject(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Rotator:
+				{
+					const UBlackboardConstantEntry_Rotator* CurrentEntry = Cast<UBlackboardConstantEntry_Rotator>(Entry);
+					BlackboardComponent->SetValueAsRotator(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::String:
+				{
+					const UBlackboardConstantEntry_String* CurrentEntry = Cast<UBlackboardConstantEntry_String>(Entry);
+					BlackboardComponent->SetValueAsString(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			case EBlackboardKeyType::Vector:
+				{
+					const UBlackboardConstantEntry_Vector* CurrentEntry = Cast<UBlackboardConstantEntry_Vector>(Entry);
+					BlackboardComponent->SetValueAsVector(CurrentEntry->EntryName, CurrentEntry->Data);
+				}
+				break;
+			default:
+				check(false);
+				break;
+		}
+	}
+}
 
 void UBlackboardConstant::UpdateConstantEntry()
 {

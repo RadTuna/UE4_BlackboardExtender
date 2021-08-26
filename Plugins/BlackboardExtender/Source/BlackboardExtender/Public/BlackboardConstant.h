@@ -41,6 +41,9 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+
+	UFUNCTION(BlueprintCallable, Category=BlackboardConstant)
+	void InitBlackboardComponent(UBlackboardComponent* BlackboardComponent);
 	
 	void UpdateConstantEntry();
 	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType, bool bIsInherit, const FText& InCategory);

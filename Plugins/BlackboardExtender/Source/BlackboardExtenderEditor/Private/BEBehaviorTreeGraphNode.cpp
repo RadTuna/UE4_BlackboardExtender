@@ -15,7 +15,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "GraphDiffControl.h"
 
-#define LOCTEXT_NAMESPACE "BehaviorTreeEditor"
+#define LOCTEXT_NAMESPACE "BlackboardExtenderEditor"
 
 UBEBehaviorTreeGraphNode::UBEBehaviorTreeGraphNode(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
