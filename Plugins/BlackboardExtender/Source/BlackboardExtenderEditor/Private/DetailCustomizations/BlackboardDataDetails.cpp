@@ -9,7 +9,6 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BEBlackboardData.h"
 #include "SBehaviorTreeBlackboardView.h"
-#include "CollisionAnalyzer/Public/ICollisionAnalyzer.h"
 
 
 #define LOCTEXT_NAMESPACE "BlackboardDataDetails"
@@ -187,29 +186,30 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	const FBlackboardEntryIdentifier OldIdentifier(CurrentEntry);
 
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
-	if (BEBlackboardData != nullptr && BEBlackboardData->Categories.Contains(OldIdentifier))
+	if (BEBlackboardData != nullptr)
 	{
-		const FText CategoryKey = *BEBlackboardData->Categories.Find(OldIdentifier);
-		BEBlackboardData->Categories.Remove(OldIdentifier);
 		CurrentEntry.EntryName = FName(*InName.ToString());
-		
 		const FBlackboardEntryIdentifier NewIdentifier(CurrentEntry);
-		BEBlackboardData->Categories.Add(NewIdentifier, CategoryKey);
-	}
-	else
-	{
-		CurrentEntry.EntryName = FName(*InName.ToString());
+		
+		if (BEBlackboardData->Categories.Contains(OldIdentifier))
+		{
+			const FText CategoryKey = *BEBlackboardData->Categories.Find(OldIdentifier);
+			BEBlackboardData->Categories.Remove(OldIdentifier);
+			BEBlackboardData->Categories.Add(NewIdentifier, CategoryKey);
+		}
+
+		if (BEBlackboardData->ConstantMap.Contains(OldIdentifier))
+		{
+			const bool Constant = *BEBlackboardData->ConstantMap.Find(OldIdentifier);
+			BEBlackboardData->ConstantMap.Remove(OldIdentifier);
+			BEBlackboardData->ConstantMap.Add(NewIdentifier, Constant);
+		}
 	}
 
 	TSharedPtr<IPropertyHandle> KeyHandle = KeysPropertyHandleCached->GetChildHandle(static_cast<uint32>(CurrentCategorySelection));
 	TSharedPtr<IPropertyHandle> EntryNameProperty = KeyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FBlackboardEntry, EntryName));
-	EntryNameProperty->NotifyPostChange(EPropertyChangeType::ValueSet);
 
-	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
-	if (BlackboardView.IsValid())
-	{
-		BlackboardView->RefreshGraphActionMenuItems();
-	}
+	PostEditBlackboardProperty();
 }
 
 bool FBlackboardDataDetails::HandleOnVerifyEntryNameChanged(const FText& InNewText, FText& OutErrorMessage)
@@ -277,13 +277,7 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 	const FBlackboardEntryIdentifier Identifier(CurrentEntry);
 	BEBlackboardData->AddUniqueCategory(Identifier, InCategory, bIsInheritedSelection);
 
-	KeysPropertyHandleCached->NotifyPostChange(EPropertyChangeType::ValueSet);
-
-	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
-	if (BlackboardView.IsValid())
-	{
-		BlackboardView->RefreshGraphActionMenuItems();
-	}
+	PostEditBlackboardProperty();
 }
 
 ECheckBoxState FBlackboardDataDetails::HandleOnIsConstantChecked() const
@@ -296,7 +290,7 @@ ECheckBoxState FBlackboardDataDetails::HandleOnIsConstantChecked() const
 		const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 		const FBlackboardEntryIdentifier Identifier(CurrentEntry);
 
-		const bool* Result = BEBlackboardData->ConstantMap.Find(Identifier);
+		const bool* Result = BEBlackboardData->GetUniqueConstant(Identifier, bIsInheritedSelection);
 		if (Result != nullptr)
 		{
 			OutState = *Result ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
@@ -315,7 +309,7 @@ void FBlackboardDataDetails::HandleOnConstantCheckStateChanged(ECheckBoxState In
 		const FBlackboardEntry& CurrentEntry = CurrentEntryArray[CurrentCategorySelection];
 		const FBlackboardEntryIdentifier Identifier(CurrentEntry);
 
-		if (BEBlackboardData->ConstantMap.Contains(Identifier))
+		if (BEBlackboardData->GetUniqueConstant(Identifier, bIsInheritedSelection) != nullptr)
 		{
 			bool CheckData = false;
 			switch (InCheckState)
@@ -331,10 +325,28 @@ void FBlackboardDataDetails::HandleOnConstantCheckStateChanged(ECheckBoxState In
 					break;
 			}
 			
-			BEBlackboardData->ConstantMap.Add(Identifier, CheckData);
+			BEBlackboardData->SetUniqueConstant(Identifier, CheckData, bIsInheritedSelection);
+
+			PostEditBlackboardProperty();
 		}
 	}
 }
 
+void FBlackboardDataDetails::PostEditBlackboardProperty()
+{
+	UBlackboardData* BlackboardData = BlackboardDataCached.Get();
+	if (BlackboardData != nullptr)
+	{
+		BlackboardData->Modify();
+	}
+	
+	KeysPropertyHandleCached->NotifyPostChange(EPropertyChangeType::ValueSet);
+
+	TSharedPtr<SBehaviorTreeBlackboardView> BlackboardView = BlackboardViewCached.Pin();
+	if (BlackboardView.IsValid())
+	{
+		BlackboardView->RefreshGraphActionMenuItems();
+	}
+}
 
 #undef LOCTEXT_NAMESPACE

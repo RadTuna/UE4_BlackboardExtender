@@ -36,6 +36,8 @@ private:
 	ECheckBoxState HandleOnIsConstantChecked() const;
 	void HandleOnConstantCheckStateChanged(ECheckBoxState InCheckState);
 
+	void PostEditBlackboardProperty();
+
 private:
 	/** Delegate used to retrieve current blackboard selection */
 	FOnGetSelectedBlackboardItemIndex OnGetSelectedBlackboardItemIndex;

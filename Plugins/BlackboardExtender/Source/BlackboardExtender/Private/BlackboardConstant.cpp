@@ -22,34 +22,31 @@
 void UBlackboardConstant::PostInitProperties()
 {
 	Super::PostInitProperties();
-
-	TArray<FBlackboardEntry> AllEntry;
-	GatherAllEntry(AllEntry);
-	UpdateConstantEntry(AllEntry);
+	
+	UpdateConstantEntry();
 }
 
 void UBlackboardConstant::PostLoad()
 {
 	Super::PostLoad();
-
-	TArray<FBlackboardEntry> AllEntry;
-	GatherAllEntry(AllEntry);
-	UpdateConstantEntry(AllEntry);
+	
+	UpdateConstantEntry();
 }
 
 #if WITH_EDITOR
 void UBlackboardConstant::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	TArray<FBlackboardEntry> AllEntry;
-	GatherAllEntry(AllEntry);
-	UpdateConstantEntry(AllEntry);
+	UpdateConstantEntry();
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
 
-void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& AllEntry)
+void UBlackboardConstant::UpdateConstantEntry()
 {
+	TArray<FBlackboardConstantGatherData> AllEntry;
+	GatherAllEntry(AllEntry);
+	
 	TMap<FName, bool> ExistFlag;
 	ValidateConstantEntry();
 	for (const UBlackboardConstantEntry* Constant : ConstantEntry)
@@ -58,8 +55,14 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 		ExistFlag.Add(Constant->EntryName, false);
 	}
 	
-	for (const FBlackboardEntry& Entry : AllEntry)
+	for (const FBlackboardConstantGatherData& GatherData : AllEntry)
 	{
+		const FBlackboardEntry& Entry = GatherData.Entry;
+		if (IsConstantEntry(Entry) == false)
+		{
+			continue;
+		}
+		
 		UBlackboardConstantEntry** FoundEntry = ConstantEntry.FindByPredicate([&Entry](const UBlackboardConstantEntry* ConstEntry)
 		{
 			return Entry.EntryName == ConstEntry->EntryName;
@@ -67,7 +70,7 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 
 		if (FoundEntry == nullptr)
 		{
-			UBlackboardConstantEntry* NewConstEntry = MakeBlackboardConstantEntry(Entry.EntryName, Entry.KeyType);
+			UBlackboardConstantEntry* NewConstEntry = MakeBlackboardConstantEntry(Entry.EntryName, Entry.KeyType, GatherData.bIsInherited, GatherData.Category);
 			if (NewConstEntry != nullptr)
 			{
 				ConstantEntry.Add(NewConstEntry);
@@ -84,6 +87,9 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 				(*FoundEntry)->BlackboardEntryType = KeyType;
 				(*FoundEntry)->ClearData();
 			}
+
+			// Changed category
+			(*FoundEntry)->Category = GatherData.Category;
 		}
 	}
 
@@ -98,10 +104,10 @@ void UBlackboardConstant::UpdateConstantEntry(const TArray<FBlackboardEntry>& Al
 		}
 	}
 
-	
+	SortConstantEntry();
 }
 
-UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType)
+UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType, bool bIsInherit, const FText& InCategory)
 {
 	UBlackboardConstantEntry* OutEntry = nullptr;
 	const EBlackboardKeyType KeyType = ConvertToEnumBlackboardKeyType(InKeyType);
@@ -144,21 +150,44 @@ UBlackboardConstantEntry* UBlackboardConstant::MakeBlackboardConstantEntry(const
 
 	if (OutEntry != nullptr)
 	{
-		OutEntry->EntryName = InEntryName;
-		OutEntry->BlackboardEntryType = KeyType;
+		OutEntry->Initialize(InEntryName, KeyType, bIsInherit, InCategory);
 	}
 
 	return OutEntry;
 }
 
-void UBlackboardConstant::GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry)
+void UBlackboardConstant::GatherAllEntry(TArray<FBlackboardConstantGatherData>& OutAllEntry)
 {
 	if (BlackboardData != nullptr)
 	{
 		OutAllEntry.Empty();
 		BlackboardData->UpdateParentKeys();
-		OutAllEntry.Append(BlackboardData->ParentKeys);
-		OutAllEntry.Append(BlackboardData->Keys);
+
+		for (int32 Index = 0; Index < BlackboardData->ParentKeys.Num(); ++Index)
+		{
+			FBlackboardConstantGatherData GatherData;
+			GatherData.Entry = BlackboardData->ParentKeys[Index];
+			GatherData.bIsInherited = true;
+			const FBlackboardEntryIdentifier Identifier(GatherData.Entry);
+			if (BlackboardData->ParentCategories.Contains(Identifier))
+			{
+				GatherData.Category = *BlackboardData->ParentCategories.Find(Identifier);
+			}
+			OutAllEntry.Add(GatherData);
+		}
+
+		for (int32 Index = 0; Index < BlackboardData->Keys.Num(); ++Index)
+		{
+			FBlackboardConstantGatherData GatherData;
+			GatherData.Entry = BlackboardData->Keys[Index];
+			GatherData.bIsInherited = false;
+			const FBlackboardEntryIdentifier Identifier(GatherData.Entry);
+			if (BlackboardData->Categories.Contains(Identifier))
+			{
+				GatherData.Category = *BlackboardData->Categories.Find(Identifier);
+			}
+			OutAllEntry.Add(GatherData);
+		}
 	}
 }
 
@@ -178,4 +207,56 @@ void UBlackboardConstant::ValidateConstantEntry()
 	{
 		ConstantEntry.Empty();
 	}
+}
+
+bool UBlackboardConstant::IsConstantEntry(const FBlackboardEntry& InEntry)
+{
+	bool bOutResult = false;
+	if (BlackboardData != nullptr)
+	{
+		const FBlackboardEntryIdentifier Identifier(InEntry);
+		if (BlackboardData->ParentConstantMap.Contains(Identifier))
+		{
+			bOutResult |= *BlackboardData->ParentConstantMap.Find(Identifier);
+		}
+		if (BlackboardData->ConstantMap.Contains(Identifier))
+		{
+			bOutResult |= *BlackboardData->ConstantMap.Find(Identifier);
+		}
+	}
+
+	return bOutResult;
+}
+
+void UBlackboardConstant::SortConstantEntry()
+{
+	ConstantEntry.Sort([this](const UBlackboardConstantEntry& InA, const UBlackboardConstantEntry& InB)
+	{
+		if (InA.bIsInheritEntry != InB.bIsInheritEntry)
+		{
+			return InA.bIsInheritEntry ? false : true;
+		}
+		
+		int32 IndexA = INDEX_NONE;
+		int32 IndexB = INDEX_NONE;
+		TArray<FBlackboardEntryIdentifier> CurrentOrder = InA.bIsInheritEntry ? BlackboardData->ParentKeysOrder : BlackboardData->KeysOrder;
+		for (int32 Index = 0; Index < CurrentOrder.Num(); ++Index)
+		{
+			if (CurrentOrder[Index].EntryName == InA.EntryName)
+			{
+				IndexA = Index;
+				break;
+			}
+		}
+		for (int32 Index = 0; Index < CurrentOrder.Num(); ++Index)
+		{
+			if (CurrentOrder[Index].EntryName == InB.EntryName)
+			{
+				IndexB = Index;
+				break;
+			}
+		}
+
+		return IndexA < IndexB;
+	});
 }

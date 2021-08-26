@@ -28,9 +28,14 @@ public:
 	// FNotifyHook Interface
 	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
 
+private:
 	TSharedPtr<IDetailsView> SpawnDetailsView();
 	TSharedRef<FTabManager::FLayout> MakeEditorLayout();
 	TSharedRef<SDockTab> SpawnDetailsTab(const FSpawnTabArgs& Args);
+
+	void BindCommands();
+	void RefreshConstantEntry();
+	void ExtendToolbar(FToolBarBuilder& ToolBarBuilder);
 
 public:
 	static const FName BlackboardConstantEditorID;

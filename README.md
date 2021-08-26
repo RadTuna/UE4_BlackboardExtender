@@ -11,7 +11,7 @@
 - 블랙보드 DetailCustomization 확장 (완료!)
 - 블랙보드 GraphActionMenu Widget Category 기능 추가 (완료!)
 - 블랙보드 GraphActionMenu Widget Drag&Drop 기능 추가 (완료!)
-- Blackboard Constant Asset 추가 (진행중...)
+- Blackboard Constant Asset 추가 (완료!)
 - Blackboard Constant 초기화 로직 구현 (대기)
 - 완료! (대기)
 

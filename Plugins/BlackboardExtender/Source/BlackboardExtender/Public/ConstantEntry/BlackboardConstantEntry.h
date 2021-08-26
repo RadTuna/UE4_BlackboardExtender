@@ -38,17 +38,27 @@ public:
 	UPROPERTY(EditAnywhere)
 	EBlackboardKeyType BlackboardEntryType;
 
+	UPROPERTY(EditAnywhere)
+	bool bIsInheritEntry;
+
+	UPROPERTY(EditAnywhere)
+	FText Category;
+
 public:
 	UBlackboardConstantEntry()
 		: EntryName(NAME_None)
 		, BlackboardEntryType(EBlackboardKeyType::Unknown)
+		, bIsInheritEntry(false)
+		, Category(FText::GetEmpty())
 	{
 	}
 
-	void Initialize(const FName& InEntryName, UBlackboardKeyType* InKeyType)
+	void Initialize(const FName& InEntryName, EBlackboardKeyType InKeyType, bool bIsInherit, const FText& InCategory)
 	{
 		EntryName = InEntryName;
-		BlackboardEntryType = ConvertToEnumBlackboardKeyType(InKeyType);
+		BlackboardEntryType = InKeyType;
+		bIsInheritEntry = bIsInherit;
+		Category = InCategory;
 	}
 
 	virtual ~UBlackboardConstantEntry() override {}

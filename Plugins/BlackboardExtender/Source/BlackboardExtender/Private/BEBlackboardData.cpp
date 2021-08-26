@@ -18,6 +18,7 @@ void UBEBlackboardData::PostInitProperties()
 	Super::PostInitProperties();
 	
 	UpdateParentElements();
+	UpdateConstantElements();
 	CleanUpCategoryMap();
 }
 
@@ -26,6 +27,7 @@ void UBEBlackboardData::PostLoad()
 	Super::PostLoad();
 	
 	UpdateParentElements();
+	UpdateConstantElements();
 	CleanUpCategoryMap();
 }
 
@@ -33,6 +35,7 @@ void UBEBlackboardData::PostLoad()
 void UBEBlackboardData::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	UpdateParentElements();
+	UpdateConstantElements();
 	PropagateChangeElements();
 	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -68,6 +71,27 @@ FText UBEBlackboardData::GetUniqueCategory(const FBlackboardEntryIdentifier& Ide
 	}
 	
 	return OutCategory;
+}
+
+void UBEBlackboardData::SetUniqueConstant(const FBlackboardEntryIdentifier& Identifier, bool bIsConstant, bool bIsInheritKey)
+{
+	TMap<FBlackboardEntryIdentifier, bool>& CurrentConstantMap = bIsInheritKey ? ParentConstantMap : ConstantMap;
+	if (CurrentConstantMap.Contains(Identifier))
+	{
+		CurrentConstantMap.Add(Identifier, bIsConstant);
+	}
+}
+
+const bool* UBEBlackboardData::GetUniqueConstant(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey)
+{
+	const TMap<FBlackboardEntryIdentifier, bool>& CurrentConstantMap = bIsInheritKey ? ParentConstantMap : ConstantMap;
+	const bool* OutConstant = nullptr;
+	if (CurrentConstantMap.Contains(Identifier))
+	{
+		OutConstant = CurrentConstantMap.Find(Identifier);
+	}
+
+	return OutConstant;
 }
 
 #if WITH_EDITOR
@@ -126,6 +150,10 @@ void UBEBlackboardData::UpdateParentElements()
 			ParentKeysOrder.Empty();
 			ParentKeysOrder.Append(ParentBlackboard->ParentKeysOrder);
 			ParentKeysOrder.Append(ParentBlackboard->KeysOrder);
+
+			ParentConstantMap.Empty();
+			ParentConstantMap.Append(ParentBlackboard->ParentConstantMap);
+			ParentConstantMap.Append(ParentBlackboard->ConstantMap);
 		}
 	}
 }
@@ -136,10 +164,7 @@ void UBEBlackboardData::UpdateConstantElements()
 	{
 		if (It->BlackboardData == this)
 		{
-			TArray<FBlackboardEntry> AllEntry;
-			AllEntry.Append(ParentKeys);
-			AllEntry.Append(Keys);
-			It->UpdateConstantEntry(AllEntry);
+			It->UpdateConstantEntry();
 		}
 	}
 }

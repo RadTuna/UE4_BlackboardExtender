@@ -10,6 +10,16 @@
 #include "BlackboardConstant.generated.h"
 
 
+USTRUCT()
+struct FBlackboardConstantGatherData
+{
+	GENERATED_BODY()
+	
+	FBlackboardEntry Entry;
+	bool bIsInherited;
+	FText Category;
+};
+
 class UBEBlackboardData;
 
 UCLASS(BlueprintType)
@@ -32,9 +42,11 @@ public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 	
-	void UpdateConstantEntry(const TArray<FBlackboardEntry>& AllEntry);
-	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType);
-	void GatherAllEntry(TArray<FBlackboardEntry>& OutAllEntry);
+	void UpdateConstantEntry();
+	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType, bool bIsInherit, const FText& InCategory);
+	void GatherAllEntry(TArray<FBlackboardConstantGatherData>& OutAllEntry);
 	void ValidateConstantEntry();
+	bool IsConstantEntry(const FBlackboardEntry& InEntry);
+	void SortConstantEntry();
 	
 };

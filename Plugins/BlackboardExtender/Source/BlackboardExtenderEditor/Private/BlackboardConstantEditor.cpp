@@ -6,6 +6,7 @@
 // User Include
 #include "BehaviorTreeEditorTabs.h"
 #include "BlackboardConstant.h"
+#include "BlackboardConstantEditorCommands.h"
 #include "DetailCustomizations/BlackboardConstantDetails.h"
 
 
@@ -56,7 +57,18 @@ void FBlackboardConstantEditor::InitBlackboardConstantEditor(const EToolkitMode:
 	const bool bCreateDefaultStandaloneMenu = true;
 	const bool bCreateDefaultToolbar = true;
 	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, BlackboardConstantEditorID, EditorLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, InObject);
-
+	
+	BindCommands();
+	
+	TSharedPtr<FExtender> ToolBarExtender = MakeShareable(new FExtender());
+	ToolBarExtender->AddToolBarExtension(
+		"Asset",
+		EExtensionHook::After,
+		GetToolkitCommands(),
+		FToolBarExtensionDelegate::CreateSP(this, &FBlackboardConstantEditor::ExtendToolbar));
+	AddToolbarExtender(ToolBarExtender);
+	RegenerateMenusAndToolbars();
+	
 	if (DetailsView.IsValid())
 	{
 		DetailsView->SetObject(InObject);
@@ -150,6 +162,32 @@ TSharedRef<SDockTab> FBlackboardConstantEditor::SpawnDetailsTab(const FSpawnTabA
 		[
 			DetailsView.ToSharedRef()
 		];
+}
+
+void FBlackboardConstantEditor::BindCommands()
+{
+	FBlackboardConstantEditorCommands::Register();
+	
+	GetToolkitCommands()->MapAction(
+		FBlackboardConstantEditorCommands::Get().RefreshConstantEditor,
+		FExecuteAction::CreateSP(this, &FBlackboardConstantEditor::RefreshConstantEntry));
+}
+
+void FBlackboardConstantEditor::RefreshConstantEntry()
+{
+	if (DetailsView.IsValid() && BlackboardConstant != nullptr)
+	{
+		DetailsView->SetObject(BlackboardConstant, true);
+	}
+}
+
+void FBlackboardConstantEditor::ExtendToolbar(FToolBarBuilder& ToolBarBuilder)
+{
+	ToolBarBuilder.BeginSection("Constant");
+	{
+		ToolBarBuilder.AddToolBarButton(FBlackboardConstantEditorCommands::Get().RefreshConstantEditor);
+	}
+	ToolBarBuilder.EndSection();
 }
 
 #undef LOCTEXT_NAMESPACE

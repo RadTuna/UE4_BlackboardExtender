@@ -66,6 +66,8 @@ public:
 
 	FText Category;
 
+	bool bIsConstant;
+
 	TWeakPtr<class SBehaviorTreeBlackboardView> BlackboardViewCached;
 
 public:

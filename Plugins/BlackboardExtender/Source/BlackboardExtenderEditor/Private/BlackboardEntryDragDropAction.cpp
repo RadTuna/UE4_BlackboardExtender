@@ -121,6 +121,14 @@ void FBlackboardEntryDragDropAction::HoverTargetChanged()
 				}
 			}
 
+			if (BlackboardHoveredAction.IsValid() && BlackboardSourceAction.IsValid())
+			{
+				if (BlackboardHoveredAction->bIsConstant != BlackboardSourceAction->bIsConstant)
+				{
+					SetFeedbackMessageError(FText::Format(LOCTEXT("CannotMoveFromInheritEntry", "Cannot move each other for constant entry and normal entry"), Args));
+				}
+			}
+
 			return;
 		}
 	}

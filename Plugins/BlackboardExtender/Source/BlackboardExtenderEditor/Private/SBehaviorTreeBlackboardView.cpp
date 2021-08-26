@@ -42,7 +42,9 @@ namespace EBlackboardSectionTitles
 	enum Type
 	{
 		InheritedKeys = 1,
+		InheritedConstantKeys,
 		Keys,
+		ConstantKeys
 	};
 }
 
@@ -63,6 +65,7 @@ FEdGraphSchemaAction_BlackboardEntry::FEdGraphSchemaAction_BlackboardEntry(TWeak
 	, bIsInherited(bInIsInherited)
 	, bIsNew(false)
 	, Category(InCategory)
+	, bIsConstant(false)
 	, BlackboardViewCached(InBlackboardView)
 {
 	check(BlackboardData);
@@ -102,6 +105,21 @@ void FEdGraphSchemaAction_BlackboardEntry::Update()
 	UpdateSearchData(FText::FromName(Key.EntryName), FText::Format(LOCTEXT("BlackboardEntryFormat", "{0} '{1}'"), Key.KeyType ? Key.KeyType->GetClass()->GetDisplayNameText() : LOCTEXT("NullKeyDesc", "None"), FText::FromName(Key.EntryName)), Category, FText());
 	SectionID = bIsInherited ? EBlackboardSectionTitles::InheritedKeys : EBlackboardSectionTitles::Keys;
 	Grouping = 1;
+
+	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardData);
+	if (BEBlackboardData != nullptr)
+	{
+		const FBlackboardEntryIdentifier Identifier(Key);
+		const bool* bResult = BEBlackboardData->GetUniqueConstant(Identifier, bIsInherited);
+		if (bResult != nullptr)
+		{
+			bIsConstant = *bResult;
+			if (bIsConstant)
+			{
+				SectionID = bIsInherited ? EBlackboardSectionTitles::InheritedConstantKeys : EBlackboardSectionTitles::ConstantKeys;
+			}
+		}
+	}
 }
 
 void FEdGraphSchemaAction_BlackboardEntry::MovePersistentItemToCategory(const FText& NewCategoryName)
@@ -157,7 +175,8 @@ bool FEdGraphSchemaAction_BlackboardEntry::ReorderToBeforeAction(TSharedRef<FEdG
 			&& TargetEntryName != GetEntryName()
 			&& BlackboardData == TargetAction->BlackboardData
 			&& !bIsInherited
-			&& bIsInherited == TargetAction->bIsInherited)
+			&& bIsInherited == TargetAction->bIsInherited
+			&& bIsConstant == TargetAction->bIsConstant)
 		{
 			const int32 FromIndex = GetReorderIndexInContainer();
 			int32 TargetIndex = TargetAction->GetReorderIndexInContainer();
@@ -722,8 +741,12 @@ FText SBehaviorTreeBlackboardView::HandleGetSectionTitle(int32 SectionID) const
 	{
 	case EBlackboardSectionTitles::InheritedKeys:
 		return LOCTEXT("InheritedKeysSectionLabel", "Inherited Keys");
+	case EBlackboardSectionTitles::InheritedConstantKeys:
+		return LOCTEXT("InheritedConstantKeysSectionLabel", "Inherited Constant Keys");
 	case EBlackboardSectionTitles::Keys:
 		return LOCTEXT("KeysSectionLabel", "Keys");
+	case EBlackboardSectionTitles::ConstantKeys:
+		return LOCTEXT("ConstantKeysSectionLabel", "Constant Keys");
 	}
 
 	return FText();
