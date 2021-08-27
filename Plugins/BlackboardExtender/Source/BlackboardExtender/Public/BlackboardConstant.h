@@ -28,13 +28,6 @@ class BLACKBOARDEXTENDER_API UBlackboardConstant : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category=Blackboard)
-	UBEBlackboardData* BlackboardData;
-
-	UPROPERTY(EditAnywhere, Category=BlackboardConstant)
-	TArray<UBlackboardConstantEntry*> ConstantEntry;
-
-public:
 	virtual void PostInitProperties() override;
 	virtual void PostLoad() override;
 
@@ -46,10 +39,19 @@ public:
 	void InitBlackboardComponent(UBlackboardComponent* BlackboardComponent);
 	
 	void UpdateConstantEntry();
+
+private:
 	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType, bool bIsInherit, const FText& InCategory);
 	void GatherAllEntry(TArray<FBlackboardConstantGatherData>& OutAllEntry);
 	void ValidateConstantEntry();
 	bool IsConstantEntry(const FBlackboardEntry& InEntry);
 	void SortConstantEntry();
+
+public:
+	UPROPERTY(EditAnywhere, Category=Blackboard)
+	UBEBlackboardData* BlackboardData;
+
+	UPROPERTY(EditAnywhere, Category=BlackboardConstant)
+	TArray<UBlackboardConstantEntry*> ConstantEntry;
 	
 };

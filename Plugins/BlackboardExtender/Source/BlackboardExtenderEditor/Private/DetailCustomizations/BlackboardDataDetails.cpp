@@ -168,14 +168,6 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	}
 
 	check(BlackboardDataCached != nullptr);
-	if (CommitType == ETextCommit::OnEnter)
-	{
-		if(OnGetSelectedBlackboardItemIndex.IsBound())
-		{
-			CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
-		}
-	}
-
 	if (CurrentCategorySelection < 0)
 	{
 		return;
@@ -188,22 +180,7 @@ void FBlackboardDataDetails::HandleOnCommittedEntryName(const FText& InName, ETe
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
 	if (BEBlackboardData != nullptr)
 	{
-		CurrentEntry.EntryName = FName(*InName.ToString());
-		const FBlackboardEntryIdentifier NewIdentifier(CurrentEntry);
-		
-		if (BEBlackboardData->Categories.Contains(OldIdentifier))
-		{
-			const FText CategoryKey = *BEBlackboardData->Categories.Find(OldIdentifier);
-			BEBlackboardData->Categories.Remove(OldIdentifier);
-			BEBlackboardData->Categories.Add(NewIdentifier, CategoryKey);
-		}
-
-		if (BEBlackboardData->ConstantMap.Contains(OldIdentifier))
-		{
-			const bool Constant = *BEBlackboardData->ConstantMap.Find(OldIdentifier);
-			BEBlackboardData->ConstantMap.Remove(OldIdentifier);
-			BEBlackboardData->ConstantMap.Add(NewIdentifier, Constant);
-		}
+		BEBlackboardData->SetEntryName(CurrentEntry.EntryName, FName(*InName.ToString()), bIsInheritedSelection);
 	}
 
 	TSharedPtr<IPropertyHandle> KeyHandle = KeysPropertyHandleCached->GetChildHandle(static_cast<uint32>(CurrentCategorySelection));
@@ -258,15 +235,7 @@ void FBlackboardDataDetails::HandleOnCommittedCategory(const FText& InCategory, 
 	
 	UBEBlackboardData* BEBlackboardData = Cast<UBEBlackboardData>(BlackboardDataCached.Get());
 	check(BEBlackboardData != nullptr);
-
-	if (CommitType == ETextCommit::OnEnter)
-	{
-		if(OnGetSelectedBlackboardItemIndex.IsBound())
-		{
-			CurrentCategorySelection = OnGetSelectedBlackboardItemIndex.Execute(bIsInheritedSelection);
-		}
-	}
-
+	
 	if (CurrentCategorySelection < 0)
 	{
 		return;

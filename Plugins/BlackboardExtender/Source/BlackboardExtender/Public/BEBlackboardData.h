@@ -53,6 +53,8 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
+	void SetEntryName(const FName& OldEntryName, const FName& NewEntryName, bool bIsInherit);
+
 	void AddUniqueCategory(const FBlackboardEntryIdentifier& Identifier, const FText& InCategory, bool bIsInheritKey);
 	FText GetUniqueCategory(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey);
 	

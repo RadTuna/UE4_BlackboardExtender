@@ -42,6 +42,36 @@ void UBEBlackboardData::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 }
 #endif
 
+void UBEBlackboardData::SetEntryName(const FName& OldEntryName, const FName& NewEntryName, bool bIsInherit)
+{
+	TArray<FBlackboardEntry>& CurrentEntries = bIsInherit ? ParentKeys : Keys;
+	FBlackboardEntry* FoundEntry = CurrentEntries.FindByPredicate([&OldEntryName](const FBlackboardEntry& Entry)
+	{
+		return Entry.EntryName == OldEntryName;
+	});
+
+	if (FoundEntry != nullptr)
+	{
+		const FBlackboardEntryIdentifier OldIdentifier(*FoundEntry);
+		FoundEntry->EntryName = FName(*NewEntryName.ToString());
+		const FBlackboardEntryIdentifier NewIdentifier(*FoundEntry);
+		
+		if (Categories.Contains(OldIdentifier))
+		{
+			const FText CategoryKey = *Categories.Find(OldIdentifier);
+			Categories.Remove(OldIdentifier);
+			Categories.Add(NewIdentifier, CategoryKey);
+		}
+
+		if (ConstantMap.Contains(OldIdentifier))
+		{
+			const bool Constant = *ConstantMap.Find(OldIdentifier);
+			ConstantMap.Remove(OldIdentifier);
+			ConstantMap.Add(NewIdentifier, Constant);
+		}
+	}
+}
+
 void UBEBlackboardData::AddUniqueCategory(const FBlackboardEntryIdentifier& Identifier, const FText& InCategory, bool bIsInheritKey)
 {
 	TMap<FBlackboardEntryIdentifier, FText>& TargetMap = bIsInheritKey ? ParentCategories : Categories;
