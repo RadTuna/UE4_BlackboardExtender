@@ -55,19 +55,31 @@ void UBEBlackboardData::SetEntryName(const FName& OldEntryName, const FName& New
 		const FBlackboardEntryIdentifier OldIdentifier(*FoundEntry);
 		FoundEntry->EntryName = FName(*NewEntryName.ToString());
 		const FBlackboardEntryIdentifier NewIdentifier(*FoundEntry);
-		
-		if (Categories.Contains(OldIdentifier))
+
+		TMap<FBlackboardEntryIdentifier, FText>& CurrentCategories = bIsInherit ? ParentCategories : Categories;
+		if (CurrentCategories.Contains(OldIdentifier))
 		{
-			const FText CategoryKey = *Categories.Find(OldIdentifier);
-			Categories.Remove(OldIdentifier);
-			Categories.Add(NewIdentifier, CategoryKey);
+			const FText CategoryKey = *CurrentCategories.Find(OldIdentifier);
+			CurrentCategories.Remove(OldIdentifier);
+			CurrentCategories.Add(NewIdentifier, CategoryKey);
 		}
 
-		if (ConstantMap.Contains(OldIdentifier))
+		TArray<FBlackboardEntryIdentifier>& CurrentKeysOrder = bIsInherit ? ParentKeysOrder : KeysOrder;
+		for (FBlackboardEntryIdentifier& CurrentIdentifier : CurrentKeysOrder)
 		{
-			const bool Constant = *ConstantMap.Find(OldIdentifier);
-			ConstantMap.Remove(OldIdentifier);
-			ConstantMap.Add(NewIdentifier, Constant);
+			if (CurrentIdentifier == OldIdentifier)
+			{
+				CurrentIdentifier.EntryName = NewIdentifier.EntryName;
+				break;
+			}
+		}
+
+		TMap<FBlackboardEntryIdentifier, bool>& CurrentConstantMap = bIsInherit ? ParentConstantMap : ConstantMap;
+		if (CurrentConstantMap.Contains(OldIdentifier))
+		{
+			const bool Constant = *CurrentConstantMap.Find(OldIdentifier);
+			CurrentConstantMap.Remove(OldIdentifier);
+			CurrentConstantMap.Add(NewIdentifier, Constant);
 		}
 	}
 }
