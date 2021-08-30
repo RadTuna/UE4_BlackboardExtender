@@ -7,11 +7,11 @@ Blackboard and Behaivior Tree in Unreal Engine are not bad. However, Blackboard 
 ## Milestone
 - Behavior Tree Hooking (Done! / Legacy)
 - Added new Blackboard Data Asset (Done!)
-- Porting the BehaviorTree Editor code (done!)
-- Blackboard DetailCustomization extension (done!)
-- Blackboard GraphActionMenu Widget Category function added (completed!)
-- Blackboard GraphActionMenu Widget Drag&Drop function added (completed!)
+- Porting the BehaviorTree Editor code (Done!)
+- Blackboard DetailCustomization extension (Done!)
+- Blackboard GraphActionMenu Widget Category feature added (Done!)
+- Blackboard GraphActionMenu Widget Drag&Drop feature added (Done!)
 - Added Blackboard Constant Asset (Done!)
-- Implementation of Blackboard Constant initialization logic (completed!)
+- Implementation of Blackboard Constant initialization logic (Done!)
 - Feature implementation completed & maintenance in progress...
 
