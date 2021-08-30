@@ -1,17 +1,17 @@
 # Blackboard Extender
-언리얼 엔진의 Blackboard를 개선하기 위한 플러그인
+Plugins to improve Blackboard in Unreal Engine
 
 ## Why Expand?
-언리얼 엔진의 Blackboard와 Behaivior Tree는 나쁘지 않습니다. 다만, Blackboard Editor는 안 좋습니다. Blueprint Editor에서는 변수나 함수를 Drag&Drop으로 정렬이 가능하고 카테고리 설정이 가능합니다. 그러나, Blackboard Editor에서는 전혀 그런 작업이 불가능합니다. 따라서, Blackboard Extender는 Blackboard Entry의 정렬 및 카테고리 기능을 제공하여 복잡한 AI를 개발함에 있어서 Blackboard를 적극 사용할 수 있도록 보조하는 역할을 수행합니다.
+Blackboard and Behaivior Tree in Unreal Engine are not bad. However, Blackboard Editor is not good. In Blueprint Editor, variables or functions can be arranged by Drag&Drop, and categories can be set. However, that is not possible at all in the Blackboard Editor. Therefore, Blackboard Extender serves as an assistant to actively use Blackboard in developing complex AI by providing sorting and categorizing functions of Blackboard Entry.
 
 ## Milestone
-- 비헤이비어 트리 후킹 (완료! / 레거시)
-- 새로운 Blackboard Data Asset 추가 (완료!)
-- BehaviorTree Editor 코드 포팅 (완료!)
-- 블랙보드 DetailCustomization 확장 (완료!)
-- 블랙보드 GraphActionMenu Widget Category 기능 추가 (완료!)
-- 블랙보드 GraphActionMenu Widget Drag&Drop 기능 추가 (완료!)
-- Blackboard Constant Asset 추가 (완료!)
-- Blackboard Constant 초기화 로직 구현 (완료!)
-- 기능 구현 완료 & 유지보수 진행중...
+- Behavior Tree Hooking (Done! / Legacy)
+- Added new Blackboard Data Asset (Done!)
+- Porting the BehaviorTree Editor code (done!)
+- Blackboard DetailCustomization extension (done!)
+- Blackboard GraphActionMenu Widget Category function added (completed!)
+- Blackboard GraphActionMenu Widget Drag&Drop function added (completed!)
+- Added Blackboard Constant Asset (Done!)
+- Implementation of Blackboard Constant initialization logic (completed!)
+- Feature implementation completed & maintenance in progress...
 

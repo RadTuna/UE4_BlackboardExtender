@@ -40,7 +40,6 @@ void UBEBlackboardData::PostEditChangeProperty(FPropertyChangedEvent& PropertyCh
 	
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
-#endif
 
 void UBEBlackboardData::SetEntryName(const FName& OldEntryName, const FName& NewEntryName, bool bIsInherit)
 {
@@ -136,7 +135,6 @@ const bool* UBEBlackboardData::GetUniqueConstant(const FBlackboardEntryIdentifie
 	return OutConstant;
 }
 
-#if WITH_EDITOR
 bool UBEBlackboardData::CompareOrderFromIdentifier(const FBlackboardEntryIdentifier& InA, const FBlackboardEntryIdentifier& InB, bool bIsInherit)
 {
 	const TArray<FBlackboardEntryIdentifier> OrderList = bIsInherit ? ParentKeysOrder : KeysOrder;

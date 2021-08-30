@@ -49,9 +49,9 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 
 	virtual void PostInitProperties() override;
 	virtual void PostLoad() override;
+	
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 
 	void SetEntryName(const FName& OldEntryName, const FName& NewEntryName, bool bIsInherit);
 
@@ -60,11 +60,10 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 	
 	void SetUniqueConstant(const FBlackboardEntryIdentifier& Identifier, bool bIsConstant, bool bIsInheritKey);
 	const bool* GetUniqueConstant(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey);
-
-#if WITH_EDITOR
+	
 	bool CompareOrderFromIdentifier(const FBlackboardEntryIdentifier& InA, const FBlackboardEntryIdentifier& InB, bool bIsInherit);
 #endif
-
+	
 private:
 	void UpdateParentElements();
 	void UpdateConstantElements();
