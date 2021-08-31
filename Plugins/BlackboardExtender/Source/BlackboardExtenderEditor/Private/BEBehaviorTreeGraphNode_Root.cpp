@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2021 RadTuna. All Rights Reserved.
 
 #include "BEBehaviorTreeGraphNode_Root.h"
 #include "UObject/UObjectIterator.h"

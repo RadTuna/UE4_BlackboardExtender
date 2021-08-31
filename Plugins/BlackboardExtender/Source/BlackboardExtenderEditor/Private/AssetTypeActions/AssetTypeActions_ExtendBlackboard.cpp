@@ -1,4 +1,4 @@
-﻿// Copyright RadTuna. All Rights Reserved.
+﻿// Copyright 2021 RadTuna. All Rights Reserved.
 
 // Primary Include
 #include "AssetTypeActions_ExtendBlackboard.h"

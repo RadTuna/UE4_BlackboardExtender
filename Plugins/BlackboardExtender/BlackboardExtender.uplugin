@@ -16,6 +16,7 @@
 	"Installed": false,
 	"EngineVersion": "4.26.*",
 	"WhitelistPlatforms": [ "Win32", "Win64" ],
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/d33a5a871da742adb85c3e8125986f84"
 	"Modules": [
 		{
 			"Name": "BlackboardExtender",
