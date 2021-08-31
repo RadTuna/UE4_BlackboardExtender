@@ -16,19 +16,25 @@ UBEBlackboardData::UBEBlackboardData(const FObjectInitializer& ObjectInitializer
 void UBEBlackboardData::PostInitProperties()
 {
 	Super::PostInitProperties();
-	
+
+#if WITH_EDITOR
 	UpdateParentElements();
 	UpdateConstantElements();
-	CleanUpCategoryMap();
+	
+	CleanUpExtendedData();
+#endif
 }
 
 void UBEBlackboardData::PostLoad()
 {
 	Super::PostLoad();
-	
+
+#if WITH_EDITOR
 	UpdateParentElements();
 	UpdateConstantElements();
-	CleanUpCategoryMap();
+	
+	CleanUpExtendedData();
+#endif
 }
 
 #if WITH_EDITOR
@@ -168,13 +174,23 @@ bool UBEBlackboardData::CompareOrderFromIdentifier(const FBlackboardEntryIdentif
 
 	return IndexA < IndexB;
 }
-#endif
+
+void UBEBlackboardData::RemoveEntry(const FBlackboardEntryIdentifier& Identifier)
+{
+	Categories.Remove(Identifier);
+	KeysOrder.Remove(Identifier);
+	ConstantMap.Remove(Identifier);
+
+	CleanUpCategoryFilter();
+}
 
 void UBEBlackboardData::UpdateParentElements()
 {
 	if (Parent == nullptr)
 	{
 		ParentCategories.Empty();
+		ParentKeysOrder.Empty();
+		ParentConstantMap.Empty();
 	}
 	else
 	{
@@ -198,17 +214,6 @@ void UBEBlackboardData::UpdateParentElements()
 	}
 }
 
-void UBEBlackboardData::UpdateConstantElements()
-{
-	for (TObjectIterator<UBlackboardConstant> It; It; ++It)
-	{
-		if (It->BlackboardData == this)
-		{
-			It->UpdateConstantEntry();
-		}
-	}
-}
-
 void UBEBlackboardData::PropagateChangeElements()
 {
 	for (TObjectIterator<UBEBlackboardData> It; It; ++It)
@@ -223,7 +228,18 @@ void UBEBlackboardData::PropagateChangeElements()
 	}
 }
 
-void UBEBlackboardData::CleanUpCategoryMap()
+void UBEBlackboardData::UpdateConstantElements()
+{
+	for (TObjectIterator<UBlackboardConstant> It; It; ++It)
+	{
+		if (It->BlackboardData == this)
+		{
+			It->UpdateConstantEntry();
+		}
+	}
+}
+
+void UBEBlackboardData::CleanUpCategoryFilter()
 {
 	TSet<FString> UniqueCategoryKeySet;
 	for (TPair<FBlackboardEntryIdentifier, FText> Pair : ParentCategories)
@@ -250,3 +266,61 @@ void UBEBlackboardData::CleanUpCategoryMap()
 	}
 }
 
+void UBEBlackboardData::CleanUpExtendedData()
+{
+	CleanUpCategoryFilter();
+	
+	TSet<FBlackboardEntryIdentifier> Identifiers;
+	for (const FBlackboardEntry& Entry : Keys)
+	{
+		Identifiers.Add(FBlackboardEntryIdentifier(Entry));
+	}
+
+	if (Identifiers.Num() <= 0)
+	{
+		return;
+	}
+	
+	// Category
+	{
+		TArray<FBlackboardEntryIdentifier> PendingKillIdentifiers;
+		for (const TPair<FBlackboardEntryIdentifier, FText>& Pair : Categories)
+		{
+			if (Identifiers.Contains(Pair.Key) == false)
+			{
+				PendingKillIdentifiers.Add(Pair.Key);
+			}
+		}
+
+		for (const FBlackboardEntryIdentifier& Identifier : PendingKillIdentifiers)
+		{
+			Categories.Remove(Identifier);
+		}
+	}
+
+	// KeyOrder
+	{
+		KeysOrder.RemoveAll([&Identifiers](const FBlackboardEntryIdentifier& Identifier)
+		{
+			return Identifiers.Contains(Identifier) == false;
+		});
+	}
+
+	// ConstantMap
+	{
+		TArray<FBlackboardEntryIdentifier> PendingKillIdentifiers;
+		for (const TPair<FBlackboardEntryIdentifier, bool>& Pair : ConstantMap)
+		{
+			if (Identifiers.Contains(Pair.Key) == false)
+			{
+				PendingKillIdentifiers.Add(Pair.Key);
+			}
+		}
+
+		for (const FBlackboardEntryIdentifier& Identifier : PendingKillIdentifiers)
+		{
+			ConstantMap.Remove(Identifier);
+		}
+	}
+}
+#endif

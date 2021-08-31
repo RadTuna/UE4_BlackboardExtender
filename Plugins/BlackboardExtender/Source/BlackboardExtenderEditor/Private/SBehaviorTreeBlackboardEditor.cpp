@@ -128,7 +128,7 @@ void SBehaviorTreeBlackboardEditor::HandleDeleteEntry()
 					if (BEBlackboardData != nullptr)
 					{
 						const FBlackboardEntryIdentifier Identifier(*BlackboardEntry);
-						BEBlackboardData->Categories.Remove(Identifier);
+						BEBlackboardData->RemoveEntry(Identifier);
 					}
 					BlackboardData->Keys.RemoveAt(ItemIndex);
 					break;

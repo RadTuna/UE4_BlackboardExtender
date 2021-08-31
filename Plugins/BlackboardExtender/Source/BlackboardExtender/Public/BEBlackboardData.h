@@ -62,14 +62,19 @@ class BLACKBOARDEXTENDER_API UBEBlackboardData : public UBlackboardData
 	const bool* GetUniqueConstant(const FBlackboardEntryIdentifier& Identifier, bool bIsInheritKey);
 	
 	bool CompareOrderFromIdentifier(const FBlackboardEntryIdentifier& InA, const FBlackboardEntryIdentifier& InB, bool bIsInherit);
+
+	void RemoveEntry(const FBlackboardEntryIdentifier& Identifier);
 #endif
 	
 private:
+#if WITH_EDITOR
 	void UpdateParentElements();
 	void UpdateConstantElements();
 	void PropagateChangeElements();
-
-	void CleanUpCategoryMap();
+	
+	void CleanUpCategoryFilter();
+	void CleanUpExtendedData();
+#endif
 	
 public:
 #if WITH_EDITORONLY_DATA

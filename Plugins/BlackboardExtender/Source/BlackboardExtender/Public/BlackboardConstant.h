@@ -37,15 +37,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category=BlackboardConstant)
 	void InitBlackboardComponent(UBlackboardComponent* BlackboardComponent);
-	
+
+#if WITH_EDITOR
 	void UpdateConstantEntry();
+#endif
 
 private:
+#if WITH_EDITOR
 	UBlackboardConstantEntry* MakeBlackboardConstantEntry(const FName& InEntryName, UBlackboardKeyType* InKeyType, bool bIsInherit, const FText& InCategory);
 	void GatherAllEntry(TArray<FBlackboardConstantGatherData>& OutAllEntry);
 	void ValidateConstantEntry();
 	bool IsConstantEntry(const FBlackboardEntry& InEntry);
 	void SortConstantEntry();
+#endif
 
 public:
 	UPROPERTY(EditAnywhere, Category=Blackboard)
