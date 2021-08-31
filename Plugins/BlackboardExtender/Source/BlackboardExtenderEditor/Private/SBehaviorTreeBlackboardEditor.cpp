@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2021 RadTuna. All Rights Reserved.
 
 #include "SBehaviorTreeBlackboardEditor.h"
 
@@ -128,7 +128,7 @@ void SBehaviorTreeBlackboardEditor::HandleDeleteEntry()
 					if (BEBlackboardData != nullptr)
 					{
 						const FBlackboardEntryIdentifier Identifier(*BlackboardEntry);
-						BEBlackboardData->Categories.Remove(Identifier);
+						BEBlackboardData->RemoveEntry(Identifier);
 					}
 					BlackboardData->Keys.RemoveAt(ItemIndex);
 					break;

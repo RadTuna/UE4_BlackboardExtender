@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2021 RadTuna. All Rights Reserved.
 
 #include "DetailCustomizations/BehaviorDecoratorDetails.h"
 #include "Layout/Margin.h"

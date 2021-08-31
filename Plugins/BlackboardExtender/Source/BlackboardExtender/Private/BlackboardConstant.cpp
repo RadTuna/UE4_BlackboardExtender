@@ -1,4 +1,4 @@
-﻿// Copyright RadTuna. All Rights Reserved.
+﻿// Copyright 2021 RadTuna. All Rights Reserved.
 
 // Primary Include
 #include "BlackboardConstant.h"
@@ -23,15 +23,19 @@
 void UBlackboardConstant::PostInitProperties()
 {
 	Super::PostInitProperties();
-	
+
+#if WITH_EDITOR
 	UpdateConstantEntry();
+#endif
 }
 
 void UBlackboardConstant::PostLoad()
 {
 	Super::PostLoad();
-	
+
+#if WITH_EDITOR
 	UpdateConstantEntry();
+#endif
 }
 
 #if WITH_EDITOR
@@ -122,6 +126,7 @@ void UBlackboardConstant::InitBlackboardComponent(UBlackboardComponent* Blackboa
 	}
 }
 
+#if WITH_EDITOR
 void UBlackboardConstant::UpdateConstantEntry()
 {
 	TArray<FBlackboardConstantGatherData> AllEntry;
@@ -340,3 +345,4 @@ void UBlackboardConstant::SortConstantEntry()
 		return IndexA < IndexB;
 	});
 }
+#endif

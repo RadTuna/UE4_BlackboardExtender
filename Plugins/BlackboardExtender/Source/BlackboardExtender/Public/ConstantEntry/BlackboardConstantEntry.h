@@ -1,4 +1,4 @@
-﻿// Copyright RadTuna. All Rights Reserved.
+﻿// Copyright 2021 RadTuna. All Rights Reserved.
 
 #pragma once
 
@@ -40,7 +40,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bIsInheritEntry;
-
+	
 	UPROPERTY(EditAnywhere)
 	FText Category;
 
@@ -49,7 +49,9 @@ public:
 		: EntryName(NAME_None)
 		, BlackboardEntryType(EBlackboardKeyType::Unknown)
 		, bIsInheritEntry(false)
+#if WITH_EDITORONLY_DATA
 		, Category(FText::GetEmpty())
+#endif
 	{
 	}
 
@@ -58,7 +60,9 @@ public:
 		EntryName = InEntryName;
 		BlackboardEntryType = InKeyType;
 		bIsInheritEntry = bIsInherit;
+#if WITH_EDITORONLY_DATA
 		Category = InCategory;
+#endif
 	}
 
 	virtual ~UBlackboardConstantEntry() override {}
