@@ -2,18 +2,5 @@
 
 // Primary Include
 #include "BlackboardExtender.h"
-
-
-#define LOCTEXT_NAMESPACE "FBlackboardExtenderModule"
-
-void FBlackboardExtenderModule::StartupModule()
-{
-}
-
-void FBlackboardExtenderModule::ShutdownModule()
-{
-}
-
-#undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FBlackboardExtenderModule, BlackboardExtender)
+IMPLEMENT_MODULE(FDefaultModuleImpl, BlackboardExtender)
